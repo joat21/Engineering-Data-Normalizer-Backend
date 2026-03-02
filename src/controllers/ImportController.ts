@@ -18,11 +18,9 @@ export const initImport: RequestHandler<any, any, InitImportBody> = async (
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const url = ""; // загрузка в S3 и получение url
-
     const sessionId = await createSession({
       categoryId,
-      fileData: { fileName: file.originalname, url },
+      file,
     });
 
     res.json({ sessionId });

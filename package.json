@@ -10,10 +10,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1000.0",
     "@prisma/client": "^7.4.2",
     "express": "^5.2.1",
     "multer": "^2.1.0",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@prisma/adapter-pg": "^7.4.2",
