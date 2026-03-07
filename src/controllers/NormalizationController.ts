@@ -1,7 +1,9 @@
 import { RequestHandler } from "express";
-import { applyColumnTransformation } from "../services/NormalizationService";
+import {
+  applyColumnTransformation,
+  mapColumnToAttribute,
+} from "../services/NormalizationService";
 import { TransformConfig, transformSchema } from "../schemas/normalization";
-import { ZodError } from "zod";
 
 export const applyTransformHandler: RequestHandler<
   any,
@@ -25,13 +27,24 @@ export const applyTransformHandler: RequestHandler<
 
     res.sendStatus(204);
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(400).json({
-        message: "Invalid data",
-        errors: error,
-      });
-      return;
-    }
+    next(error);
+  }
+};
+
+export const mapColToAttrHandler: RequestHandler<
+  any,
+  any,
+  {
+    sessionId: string;
+    colIndex: number;
+    attributeId: string;
+  }
+> = async (req, res, next) => {
+  try {
+    await mapColumnToAttribute(req.body);
+
+    res.sendStatus(204);
+  } catch (error) {
     next(error);
   }
 };

@@ -2,6 +2,11 @@ import { JsonValue } from "@prisma/client/runtime/client";
 import { prisma } from "../../prisma/prisma";
 import * as TransformUtils from "../helpers/transformers";
 import { TransformConfig } from "../schemas/normalization";
+import {
+  normalizer,
+  TransformedColumn,
+  TransformedRow,
+} from "../helpers/normalizers";
 
 export type TransformType = TransformConfig["type"];
 
@@ -57,28 +62,74 @@ export const applyColumnTransformation = async (params: {
   colIndex: number;
   transform: TransformConfig;
   attributesOrder: string[];
-}) => {
-  const items = await prisma.stagingImportItem.findMany({
-    where: { sessionId: params.sessionId },
-  });
-
-  const updates = items.map((item) => {
-    const rawValue = getRawValue(item.rawRow, params.colIndex);
+}) =>
+  processColumnUpdate(params.sessionId, params.colIndex, (rawValue) => {
     const results = applyTransform(rawValue, params.transform);
 
-    const existingData = (item.transformedRow as Record<string, any>) || {};
-    const newData = { ...existingData };
-    params.attributesOrder.forEach((attrId, i) => {
-      newData[attrId] = results[i] ?? null;
-    });
-
-    return prisma.stagingImportItem.update({
-      where: { id: item.id },
-      data: { transformedRow: newData },
-    });
+    return params.attributesOrder.map((attrId, i) => ({
+      attributeId: attrId,
+      rawValue: String(rawValue),
+      normalized: normalizer(String(results[i])),
+    }));
   });
 
-  return await prisma.$transaction(updates);
+export const mapColumnToAttribute = async (params: {
+  sessionId: string;
+  colIndex: number;
+  attributeId: string;
+}) =>
+  processColumnUpdate(params.sessionId, params.colIndex, (rawValue) => {
+    return [
+      {
+        attributeId: params.attributeId,
+        rawValue: String(rawValue),
+        normalized: normalizer(String(rawValue)),
+      },
+    ];
+  });
+
+const processColumnUpdate = async (
+  sessionId: string,
+  colIndex: number,
+  getColumnData: (rawValue: any) => TransformedColumn[],
+) => {
+  const items = await prisma.stagingImportItem.findMany({
+    where: { sessionId },
+    select: { id: true, rawRow: true, transformedRow: true },
+  });
+
+  const dataToUpdate = items.map((item) => {
+    const rawValue = getRawValue(item.rawRow, colIndex);
+
+    const columnMappings = getColumnData(rawValue);
+
+    const existingRow =
+      (item.transformedRow as unknown as TransformedRow) || {};
+    const newData: TransformedRow = {
+      ...existingRow,
+      [colIndex.toString()]: columnMappings,
+    };
+
+    return {
+      id: item.id,
+      transformedRow: JSON.stringify(newData).replace(/'/g, "''"),
+    };
+  });
+
+  if (dataToUpdate.length === 0) return { success: true, count: 0 };
+
+  const values = dataToUpdate
+    .map((d) => `('${d.id}'::uuid, '${d.transformedRow}'::jsonb)`)
+    .join(",");
+
+  await prisma.$executeRawUnsafe(`
+    UPDATE "StagingImportItem" AS t
+    SET "transformedRow" = v.new_val
+    FROM (VALUES ${values}) AS v(id, new_val)
+    WHERE t.id = v.id;
+  `);
+
+  return { success: true, count: dataToUpdate.length };
 };
 
 const getRawValue = (

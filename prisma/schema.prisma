@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id           String      @id @default(uuid())
+  id           String      @id @default(uuid()) @db.Uuid
   email        String
   passwordHash String
   name         String
@@ -16,7 +16,7 @@ model User {
 }
 
 model Project {
-  id          String        @id @default(uuid())
+  id          String        @id @default(uuid()) @db.Uuid
   name        String
   description String
   isArchived  Boolean
@@ -24,33 +24,46 @@ model Project {
 }
 
 model ProjectItem {
-  id          String    @id @default(uuid())
+  id          String    @id @default(uuid()) @db.Uuid
   project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String
+  projectId   String    @db.Uuid
   equipment   Equipment @relation(fields: [equipmentId], references: [id])
-  equipmentId String
+  equipmentId String    @db.Uuid
   amount      Int       @db.SmallInt
   updatedAt   DateTime  @default(now()) @db.Timestamptz()
 }
 
 model Equipment {
-  id           String        @id @default(uuid())
-  category     Category      @relation(fields: [categoryId], references: [id])
-  categoryId   String
-  source       Source        @relation(fields: [sourceId], references: [id])
-  sourceId     String
+  id           String                    @id @default(uuid()) @db.Uuid
+  category     Category                  @relation(fields: [categoryId], references: [id])
+  categoryId   String                    @db.Uuid
+  source       Source                    @relation(fields: [sourceId], references: [id])
+  sourceId     String                    @db.Uuid
   name         String?
   manufacter   String?
   article      String?
   model        String?
   externalCode String?
-  price        Decimal       @db.Decimal(12, 2)
-  attributes   Json
+  price        Decimal                   @db.Decimal(12, 2)
   projectItems ProjectItem[]
+  attributes   EquipmentAttributeValue[]
+}
+
+model EquipmentAttributeValue {
+  id           String            @id @default(uuid()) @db.Uuid
+  equipment    Equipment         @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  equipmentId  String            @db.Uuid
+  attribute    CategoryAttribute @relation(fields: [attributeId], references: [id])
+  attributeId  String            @db.Uuid
+  valueString  String
+  valueMin     Decimal?          @db.Decimal(12, 2)
+  valueMax     Decimal?          @db.Decimal(12, 2)
+  valueArray   Json?
+  valueBoolean Boolean?
 }
 
 model Category {
-  id             String              @id @default(uuid())
+  id             String              @id @default(uuid()) @db.Uuid
   name           String
   equipment      Equipment[]
   attributes     CategoryAttribute[]
@@ -59,19 +72,20 @@ model Category {
 }
 
 model CategoryAttribute {
-  id           String           @id @default(uuid())
-  category     Category         @relation(fields: [categoryId], references: [id])
-  categoryId   String
-  key          String
-  label        String
-  unit         String
-  dataType     DataType
-  isFilterable Boolean
-  filters      CategoryFilter[]
+  id                       String                    @id @default(uuid()) @db.Uuid
+  category                 Category                  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId               String                    @db.Uuid
+  key                      String
+  label                    String
+  unit                     String
+  dataType                 DataType
+  isFilterable             Boolean
+  filters                  CategoryFilter[]
+  equipmentAttributeValues EquipmentAttributeValue[]
 }
 
 model Source {
-  id             String          @id @default(uuid())
+  id             String          @id @default(uuid()) @db.Uuid
   fileName       String
   url            String
   uploadedAt     DateTime        @default(now()) @db.Timestamptz()
@@ -82,45 +96,44 @@ model Source {
 }
 
 model Comparison {
-  id     String           @id @default(uuid())
+  id     String           @id @default(uuid()) @db.Uuid
   user   User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String?          @unique
+  userId String?          @unique @db.Uuid
   items  ComparisonItem[]
 }
 
 model ComparisonItem {
-  id           String     @id @default(uuid())
+  id           String     @id @default(uuid()) @db.Uuid
   comparison   Comparison @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
-  comparisonId String
+  comparisonId String     @db.Uuid
 }
 
 model ImportSession {
-  id         String              @id @default(uuid())
+  id         String              @id @default(uuid()) @db.Uuid
   source     Source              @relation(fields: [sourceId], references: [id])
-  sourceId   String
+  sourceId   String              @db.Uuid
   category   Category            @relation(fields: [categoryId], references: [id])
-  categoryId String
+  categoryId String              @db.Uuid
   createdAt  DateTime            @default(now()) @db.Timestamptz()
   status     ImportStatus        @default(PENDING)
   items      StagingImportItem[]
 }
 
 model StagingImportItem {
-  id             String           @id @default(uuid())
+  id             String           @id @default(uuid()) @db.Uuid
   session        ImportSession    @relation(fields: [sessionId], references: [id])
-  sessionId      String
-  rowIndex       Int
+  sessionId      String           @db.Uuid
   rawRow         Json
   transformedRow Json?
   status         ImportItemStatus @default(PENDING)
 }
 
 model CategoryFilter {
-  id          String            @id @default(uuid())
+  id          String            @id @default(uuid()) @db.Uuid
   category    Category          @relation(fields: [categoryId], references: [id])
-  categoryId  String
-  attribure   CategoryAttribute @relation(fields: [attribureId], references: [id])
-  attribureId String
+  categoryId  String            @db.Uuid
+  attribute   CategoryAttribute @relation(fields: [attributeId], references: [id])
+  attributeId String            @db.Uuid
 }
 
 enum DataType {

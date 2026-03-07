@@ -44,9 +44,8 @@ export const addItemsToStaging = async (data: {
   if (!session) throw new Error("Session not found");
 
   await prisma.stagingImportItem.createMany({
-    data: data.rows.map((row, index) => ({
+    data: data.rows.map((row) => ({
       sessionId: data.sessionId,
-      rowIndex: index,
       rawRow: row,
     })),
   });
