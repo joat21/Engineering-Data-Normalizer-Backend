@@ -1,15 +1,10 @@
-import { RequestHandler } from "express";
 import { addItemsToStaging, createSession } from "../services/ImportService";
+import { importRowsSchema, initImportSchema } from "../schemas/import";
+import { HandlerFromSchema } from "../types/zod";
 
-interface InitImportBody {
-  categoryId: string;
-}
-
-export const initImport: RequestHandler<any, any, InitImportBody> = async (
-  req,
-  res,
-  next,
-) => {
+export const initImportHandler: HandlerFromSchema<
+  typeof initImportSchema
+> = async (req, res, next) => {
   try {
     const { categoryId } = req.body;
     const file = req.file;
@@ -29,16 +24,9 @@ export const initImport: RequestHandler<any, any, InitImportBody> = async (
   }
 };
 
-interface ImportRowsBody {
-  sessionId: string;
-  rows: (string | number)[][];
-}
-
-export const importRows: RequestHandler<any, any, ImportRowsBody> = async (
-  req,
-  res,
-  next,
-) => {
+export const importRowsHandler: HandlerFromSchema<
+  typeof importRowsSchema
+> = async (req, res, next) => {
   try {
     await addItemsToStaging(req.body);
 

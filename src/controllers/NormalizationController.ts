@@ -3,17 +3,14 @@ import {
   applyColumnTransformation,
   mapColumnToAttribute,
 } from "../services/NormalizationService";
-import { TransformConfig, transformSchema } from "../schemas/normalization";
+import {
+  applyTransformSchema,
+  transformSchema,
+} from "../schemas/normalization";
+import { HandlerFromSchema } from "../types/zod";
 
-export const applyTransformHandler: RequestHandler<
-  any,
-  any,
-  {
-    sessionId: string;
-    colIndex: number;
-    transform: TransformConfig;
-    attributesOrder: string[];
-  }
+export const applyTransformHandler: HandlerFromSchema<
+  typeof applyTransformSchema
 > = async (req, res, next) => {
   try {
     const transform = transformSchema.parse(req.body.transform);

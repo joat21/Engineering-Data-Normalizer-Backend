@@ -13,3 +13,20 @@ export const transformSchema = z.discriminatedUnion("type", [
 ]);
 
 export type TransformConfig = z.infer<typeof transformSchema>;
+
+export const applyTransformSchema = z.object({
+  body: z.object({
+    sessionId: z.uuid(),
+    colIndex: z.number(),
+    transform: transformSchema,
+    attributesOrder: z.array(z.string()),
+  }),
+});
+
+export const mapColToAttrSchema = z.object({
+  body: z.object({
+    sessionId: z.uuid(),
+    colIndex: z.number(),
+    attributeId: z.uuid(),
+  }),
+});
