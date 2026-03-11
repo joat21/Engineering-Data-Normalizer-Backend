@@ -19,7 +19,7 @@ export const applyTransformSchema = z.object({
     sessionId: z.uuid(),
     colIndex: z.number(),
     transform: transformSchema,
-    attributesOrder: z.array(z.string()),
+    attributesOrder: z.array(z.string().or(z.null())),
   }),
 });
 

@@ -21,7 +21,7 @@ export const applyColumnTransformation = async (params: {
   sessionId: string;
   colIndex: number;
   transform: TransformConfig;
-  attributesOrder: string[];
+  attributesOrder: (string | null)[];
 }) =>
   updateColumn(
     params.sessionId,
@@ -33,11 +33,13 @@ export const applyColumnTransformation = async (params: {
 const updateColumn = async (
   sessionId: string,
   colIndex: number,
-  attributeIds: string[],
+  attributeIds: (string | null)[],
   getUpdatedData: (rawValue: any) => any[],
 ) => {
+  const validAttrIds = attributeIds.filter((id) => id !== null);
+
   const attributes = await prisma.categoryAttribute.findMany({
-    where: { id: { in: attributeIds } },
+    where: { id: { in: validAttrIds } },
     select: { id: true, dataType: true },
   });
   const typeMap = new Map(attributes.map((a) => [a.id, a.dataType]));
@@ -54,6 +56,8 @@ const updateColumn = async (
     const updatedData = getUpdatedData(rawValue);
 
     attributeIds.forEach((attrId, i) => {
+      if (!attrId) return null;
+
       const val = String(updatedData[i] ?? "")
         .toLowerCase()
         .trim();
@@ -92,21 +96,25 @@ const updateColumn = async (
     const rawValue = getRawValue(item.rawRow, colIndex);
     const updatedData = getUpdatedData(rawValue);
 
-    const columnMappings = attributeIds.map((attrId, i) => {
-      const valueToNormalize = String(updatedData[i] ?? "");
-      const attrType = typeMap.get(attrId) || "STRING";
+    const columnMappings = attributeIds
+      .map((attrId, i) => {
+        if (!attrId) return null;
 
-      return {
-        attributeId: attrId,
-        rawValue: String(rawValue),
-        normalized: normalizeValue(
-          valueToNormalize,
-          attrType,
-          attrId,
-          cacheMap,
-        ),
-      };
-    });
+        const valueToNormalize = String(updatedData[i] ?? "");
+        const attrType = typeMap.get(attrId) || "STRING";
+
+        return {
+          attributeId: attrId,
+          rawValue: String(rawValue),
+          normalized: normalizeValue(
+            valueToNormalize,
+            attrType,
+            attrId,
+            cacheMap,
+          ),
+        };
+      })
+      .filter((m) => m !== null);
 
     const existingRow =
       (item.transformedRow as unknown as TransformedRow) || {};
@@ -134,6 +142,4 @@ const updateColumn = async (
     FROM (VALUES ${values}) AS v(id, new_val)
     WHERE t.id = v.id;
   `);
-
-  return { success: true, count: dataToUpdate.length };
 };
