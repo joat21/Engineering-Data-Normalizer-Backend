@@ -1,7 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
-import { prisma } from "../../prisma/prisma";
-import { Prisma } from "../generated/prisma/client";
-import { TransformedRow } from "./NormalizationService/types";
+import { getOperator } from "./helpers";
+import { prisma } from "../../../prisma/prisma";
+import { Prisma } from "../../generated/prisma/client";
+import { TransformedRow } from "../NormalizationService/types";
+import { FIELD_MAP } from "./config";
+import { FilterValue, NumericFilterValue } from "./types";
+
+export const getCategories = async () => await prisma.category.findMany();
 
 export const saveEquipmentFromStaging = async (sessionId: string) => {
   const session = await prisma.importSession.findUnique({
@@ -101,61 +106,87 @@ export const saveEquipmentFromStaging = async (sessionId: string) => {
   });
 };
 
-export const getEquipmentTable = async (categoryId: string) => {
-  const categoryAttributes = await prisma.categoryAttribute.findMany({
+export const getEquipmentTable = async (
+  categoryId: string,
+  query: Record<string, FilterValue>,
+) => {
+  const categoryFilters = await prisma.categoryFilter.findMany({
     where: { categoryId },
-    select: { id: true, label: true },
   });
 
+  const andConditions: Prisma.EquipmentWhereInput[] = [{ categoryId }];
+
+  for (const filter of categoryFilters) {
+    const key = filter.systemField || `attr_${filter.attributeId}`;
+    const value = query[key];
+    const operator = getOperator(filter.type, value);
+
+    if (!operator) continue;
+
+    if (filter.systemField) {
+      andConditions.push({ [filter.systemField]: operator });
+    } else if (filter.attributeId) {
+      if (filter.type === "NUMBER") {
+        const val = value as NumericFilterValue;
+        const attrMatch: any = { attributeId: filter.attributeId };
+
+        if (val.min !== undefined || val.max !== undefined) {
+          if (val.max !== undefined) attrMatch.valueMin = { lte: val.max };
+          if (val.min !== undefined) attrMatch.valueMax = { gte: val.min };
+        }
+
+        if (val.options && val.options.length > 0) {
+          attrMatch.valueString = { in: val.options };
+        }
+
+        andConditions.push({ attributes: { some: attrMatch } });
+      } else {
+        const fieldName = FIELD_MAP[filter.type];
+
+        andConditions.push({
+          attributes: {
+            some: {
+              attributeId: filter.attributeId,
+              [fieldName]: operator,
+            },
+          },
+        });
+      }
+    }
+  }
+
   const equipment = await prisma.equipment.findMany({
-    where: { categoryId },
+    where: { AND: andConditions },
     include: { attributes: true },
   });
 
-  const usedAttrIds = new Set(
-    equipment.flatMap((e) => e.attributes.map((a) => a.attributeId)),
-  );
-  const usedAttrs = categoryAttributes.filter((attr) =>
-    usedAttrIds.has(attr.id),
-  );
-
   const headers = [
-    { key: "name", label: "Название", type: "system" },
-    { key: "article", label: "Артикул", type: "system" },
-    { key: "model", label: "Модель", type: "system" },
-    { key: "manufacturer", label: "Производитель", type: "system" },
-    { key: "externalCode", label: "Код", type: "system" },
-    { key: "price", label: "Цена", type: "system" },
-    ...usedAttrs.map((attr) => ({
-      key: `attr_${attr.id}`,
-      label: attr.label,
-      type: "attribute",
+    ...categoryFilters.map((f) => ({
+      key: f.systemField || `attr_${f.attributeId}`,
+      label: f.label,
+      type: f.systemField ? "system" : "attribute",
     })),
   ];
 
   const rows = equipment.map((item) => {
-    item.externalCode;
-    const row: any = {
-      id: item.id,
-      article: item.article,
-      model: item.model,
-      name: item.name,
-      manufacturer: item.manufacturer,
-      externalCode: item.externalCode,
-      price: item.price,
-    };
+    const row: any = { id: item.id };
+
+    categoryFilters
+      .filter((f) => f.systemField)
+      .forEach((f) => {
+        row[f.systemField!] = (item as any)[f.systemField!];
+      });
 
     const valuesMap = new Map(item.attributes.map((a) => [a.attributeId, a]));
-
-    usedAttrs.forEach((attr) => {
-      const val = valuesMap.get(attr.id);
-      row[`attr_${attr.id}`] = val ? val.valueString : null;
-    });
+    categoryFilters
+      .filter((f) => f.attributeId)
+      .forEach((f) => {
+        const val = valuesMap.get(f.attributeId!);
+        row[`attr_${f.attributeId}`] = val ? val.valueString : null;
+      });
 
     return row;
   });
 
   return { headers, rows };
 };
-
-export const getCategories = async () => await prisma.category.findMany();

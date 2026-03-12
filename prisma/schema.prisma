@@ -84,6 +84,23 @@ model CategoryAttribute {
   equipmentAttributeValues EquipmentAttributeValue[]
 }
 
+model CategoryFilter {
+  id          String             @id @default(uuid()) @db.Uuid
+  category    Category           @relation(fields: [categoryId], references: [id])
+  categoryId  String             @db.Uuid
+  attribute   CategoryAttribute? @relation(fields: [attributeId], references: [id])
+  attributeId String?            @db.Uuid
+  systemField String?
+  label       String
+  type        DataType
+  minValue    Decimal?           @db.Decimal(12, 2)
+  maxValue    Decimal?           @db.Decimal(12, 2)
+  options     Json?
+
+  @@unique([categoryId, attributeId])
+  @@unique([categoryId, systemField])
+}
+
 model Source {
   id             String          @id @default(uuid()) @db.Uuid
   fileName       String
@@ -126,14 +143,6 @@ model StagingImportItem {
   rawRow         Json
   transformedRow Json?
   status         ImportItemStatus @default(PENDING)
-}
-
-model CategoryFilter {
-  id          String            @id @default(uuid()) @db.Uuid
-  category    Category          @relation(fields: [categoryId], references: [id])
-  categoryId  String            @db.Uuid
-  attribute   CategoryAttribute @relation(fields: [attributeId], references: [id])
-  attributeId String            @db.Uuid
 }
 
 model NormalizationCache {

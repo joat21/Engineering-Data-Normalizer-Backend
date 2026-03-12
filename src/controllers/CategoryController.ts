@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { getCategories } from "../services/EquipmentService";
+import { getCategories } from "../services/EquipmentService/service";
 
 export const getAll: RequestHandler = async (_req, res, next) => {
   try {
