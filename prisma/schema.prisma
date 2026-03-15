@@ -140,10 +140,13 @@ model StagingImportItem {
   id                  String               @id @default(uuid()) @db.Uuid
   session             ImportSession        @relation(fields: [sessionId], references: [id])
   sessionId           String               @db.Uuid
+  rowIndex            Int
   rawRow              Json
   transformedRow      Json?
   status              ImportItemStatus     @default(PENDING)
   aiExtractionResults AiExtractionResult[]
+
+  @@index([rowIndex])
 }
 
 model NormalizationCache {

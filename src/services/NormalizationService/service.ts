@@ -93,6 +93,10 @@ export const applyAiExtraction = async (params: {
     where: { sessionId: parsingSessionId },
   });
 
+  if (!aiRows.length) {
+    throw new Error("Parsing session not found");
+  }
+
   const items = await prisma.stagingImportItem.findMany({
     where: { sessionId: importSessionId },
     select: { id: true, rawRow: true, transformedRow: true },

@@ -13,6 +13,7 @@ export const aiParseSchema = z.object({
     importSessionId: z.uuid(),
     colIndex: z.number(),
     targets: z.array(aiParseTargetSchema),
+    testRowIndexes: z.array(z.number()).optional(),
   }),
 });
 

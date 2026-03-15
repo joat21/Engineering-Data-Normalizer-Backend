@@ -11,13 +11,29 @@ export async function processAiParsing(data: {
   importSessionId: string;
   colIndex: number;
   targets: ParseTarget[];
+  testRowIndexes?: number[];
 }) {
   const sessionId = uuidv4();
-  const { importSessionId, colIndex, targets } = data;
+  const { importSessionId, colIndex, targets, testRowIndexes } = data;
+  const isTest = !!testRowIndexes?.length;
+
+  const where: Prisma.StagingImportItemWhereInput = {
+    sessionId: importSessionId,
+  };
+
+  if (testRowIndexes?.length) {
+    where.rowIndex = {
+      in: testRowIndexes,
+    };
+  }
 
   const rows = await prisma.stagingImportItem.findMany({
-    where: { sessionId: importSessionId },
-    select: { id: true, rawRow: true },
+    where,
+    select: {
+      id: true,
+      rawRow: true,
+      rowIndex: true,
+    },
   });
 
   const linesToParse = rows
@@ -47,9 +63,13 @@ export async function processAiParsing(data: {
     }
   }
 
-  await prisma.aiExtractionResult.createMany({
-    data: recordsToSave,
-  });
+  // TODO: возможно стоит сделать так, чтобы тестовые строки сохранялись при тестовом прогоне,
+  // но не использовались при прогоне всей колонки
+  if (!isTest) {
+    await prisma.aiExtractionResult.createMany({
+      data: recordsToSave,
+    });
+  }
 
   const headers = [
     { key: "sourceString", label: "Исходная строка" },
