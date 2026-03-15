@@ -1,12 +1,8 @@
-import {
-  getCacheMap,
-  getMappingPlans,
-  getRawValue,
-  getTypeMap,
-} from "./helpers";
+import { getCacheMap, getMappingPlans, getTypeMap } from "./helpers";
 import { applyTransform } from "./transformers";
 import { MappingTarget, TransformedRow, TransformConfig } from "./types";
 import { prisma } from "../../../prisma/prisma";
+import { getRawValue } from "../../helpers/getRawValue";
 
 export const mapColumnToAttribute = async (params: {
   sessionId: string;

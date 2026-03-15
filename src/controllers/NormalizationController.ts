@@ -8,6 +8,8 @@ import {
   transformSchema,
 } from "../schemas/normalization";
 import { HandlerFromSchema } from "../types/zod";
+import { aiParseSchema } from "../schemas/ai";
+import { processAiParsing } from "../services/AIService/service";
 
 export const applyTransformHandler: HandlerFromSchema<
   typeof applyTransformSchema
@@ -33,6 +35,20 @@ export const mapColToAttrHandler: HandlerFromSchema<
     await mapColumnToAttribute(req.body);
 
     res.sendStatus(204);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const applyAiParse: HandlerFromSchema<typeof aiParseSchema> = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const result = await processAiParsing(req.body);
+
+    res.json(result);
   } catch (error) {
     next(error);
   }

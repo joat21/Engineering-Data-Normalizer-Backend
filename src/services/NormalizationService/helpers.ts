@@ -9,6 +9,7 @@ import {
 import { DataType } from "../../generated/prisma/enums";
 import { prisma } from "../../../prisma/prisma";
 import { DATA_TYPE, TARGET_TYPE } from "../../config";
+import { getRawValue } from "../../helpers/getRawValue";
 
 export const getTypeMap = async (targets: (MappingTarget | null)[]) => {
   const attrIds = targets
@@ -112,16 +113,4 @@ export const getMappingPlans = (
         ),
     };
   });
-};
-
-export const getRawValue = (
-  rawRow: JsonValue,
-  colIndex: number,
-): TransformPayload => {
-  if (!Array.isArray(rawRow)) return null;
-
-  const val = rawRow[colIndex];
-  return typeof val === "string" || typeof val === "number" || val === null
-    ? val
-    : null;
 };

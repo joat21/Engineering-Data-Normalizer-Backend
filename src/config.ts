@@ -1,6 +1,7 @@
 import {
   ImportStatus,
   DataType as PrismaDataType,
+  MappingTargetType,
 } from "./generated/prisma/client";
 import { EquipmentSystemFields } from "./types";
 
@@ -12,10 +13,7 @@ export const TRANSFORM_TYPE = {
   MULTIPLY: "MULTIPLY",
 } as const;
 
-export const TARGET_TYPE = {
-  SYSTEM: "system",
-  ATTRIBUTE: "attribute",
-} as const;
+export const TARGET_TYPE = MappingTargetType;
 
 export const SYSTEM_FIELDS_CONFIG = {
   name: { label: "Название", type: "STRING" },

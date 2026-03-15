@@ -137,12 +137,13 @@ model ImportSession {
 }
 
 model StagingImportItem {
-  id             String           @id @default(uuid()) @db.Uuid
-  session        ImportSession    @relation(fields: [sessionId], references: [id])
-  sessionId      String           @db.Uuid
-  rawRow         Json
-  transformedRow Json?
-  status         ImportItemStatus @default(PENDING)
+  id                  String               @id @default(uuid()) @db.Uuid
+  session             ImportSession        @relation(fields: [sessionId], references: [id])
+  sessionId           String               @db.Uuid
+  rawRow              Json
+  transformedRow      Json?
+  status              ImportItemStatus     @default(PENDING)
+  aiExtractionResults AiExtractionResult[]
 }
 
 model NormalizationCache {
@@ -154,6 +155,17 @@ model NormalizationCache {
 
   @@unique([attributeId, cleanedValue])
   @@index([cleanedValue])
+}
+
+model AiExtractionResult {
+  id           String            @id @default(uuid()) @db.Uuid
+  sourceItem   StagingImportItem @relation(fields: [sourceItemId], references: [id])
+  sourceItemId String            @db.Uuid
+  sessionId    String            @db.Uuid
+  targetType   MappingTargetType
+  target       String
+  rawValue     String
+  isEdited     Boolean           @default(false)
 }
 
 enum DataType {
@@ -178,4 +190,9 @@ enum ImportItemStatus {
   PENDING
   TRANSFORMED
   EDITED_MANUALLY
+}
+
+enum MappingTargetType {
+  SYSTEM
+  ATTRIBUTE
 }
