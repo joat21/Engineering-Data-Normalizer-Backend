@@ -1,10 +1,10 @@
 import { RequestHandler } from "express";
+import { HandlerFromSchema } from "../types/zod";
+import { getCategoryFiltersSchema } from "../schemas/category";
 import {
   getCategories,
   getCategoryFilters,
-} from "../services/EquipmentService/service";
-import { HandlerFromSchema } from "../types/zod";
-import { getCategoryFiltersSchema } from "../schemas/category";
+} from "../services/CategoryService/service";
 
 export const getAllHandler: RequestHandler = async (_req, res, next) => {
   try {
