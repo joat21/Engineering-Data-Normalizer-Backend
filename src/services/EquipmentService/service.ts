@@ -11,6 +11,7 @@ import {
   SYSTEM_FIELDS,
   TARGET_TYPE,
 } from "../../config";
+import { recalculateFilters } from "../CategoryService/recalculateFilters";
 
 const LIMIT = 20;
 
@@ -87,7 +88,7 @@ export const saveEquipmentFromStaging = async (sessionId: string) => {
     equipmentToCreate.push(equipmentEntry);
   });
 
-  return await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     if (equipmentToCreate.length > 0) {
       await tx.equipment.createMany({
         data: equipmentToCreate,
@@ -110,6 +111,13 @@ export const saveEquipmentFromStaging = async (sessionId: string) => {
       attributesCount: attributesToCreate.length,
     };
   });
+
+  recalculateFilters(session.categoryId).catch(console.error);
+  prisma.stagingImportItem
+    .deleteMany({ where: { sessionId } })
+    .catch(console.error);
+
+  return result;
 };
 
 export const getEquipmentTable = async (data: {

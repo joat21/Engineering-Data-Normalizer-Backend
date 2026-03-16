@@ -2,7 +2,7 @@ import {
   getEquipmentTableSchema,
   saveFromStagingSchema,
 } from "../schemas/equipment";
-import { recalculateFilters } from "../services/EquipmentService/helpers";
+import { recalculateFilters } from "../services/CategoryService/recalculateFilters";
 import {
   getEquipmentTable,
   saveEquipmentFromStaging,
