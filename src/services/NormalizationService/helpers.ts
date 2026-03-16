@@ -3,7 +3,6 @@ import { isSimpleNumeric, normalizeValue } from "./normalizers";
 import { AttributeTarget, MappingPlan, MappingTarget } from "./types";
 import { prisma } from "../../../prisma/prisma";
 import { DATA_TYPE, TARGET_TYPE } from "../../config";
-import { getRawValue } from "../../helpers/getRawValue";
 import { DataType } from "../../types";
 
 export const getTypeMap = async (targets: (MappingTarget | null)[]) => {
@@ -24,66 +23,6 @@ export const getTypeMap = async (targets: (MappingTarget | null)[]) => {
 };
 
 export const getCacheMap = async (
-  targets: (MappingTarget | null)[],
-  items: {
-    id: string;
-    rawRow: JsonValue;
-    transformedRow: JsonValue;
-  }[],
-  typeMap: Map<string, DataType>,
-  colIndex: number,
-  getUpdatedData: (rawValue: any) => any[],
-) => {
-  if (typeMap.size === 0) {
-    return new Map<string, JsonValue>();
-  }
-
-  const cacheLookupSet = new Set<string>();
-
-  items.forEach((item) => {
-    const rawValue = getRawValue(item.rawRow, colIndex);
-    const updatedData = getUpdatedData(rawValue);
-
-    targets.forEach((target, i) => {
-      if (!target || target.type !== TARGET_TYPE.ATTRIBUTE) return;
-
-      const val = String(updatedData[i] ?? "")
-        .toLowerCase()
-        .trim();
-
-      const attrType = typeMap.get(target.id);
-
-      if (attrType !== DATA_TYPE.NUMBER) {
-        cacheLookupSet.add(`${target.id}:${val}`);
-      } else {
-        const parts = val.split(/[\s]*[xх×][\s]*/).filter((p) => p.length > 0);
-        parts.forEach((p) => {
-          if (!isSimpleNumeric(p)) {
-            cacheLookupSet.add(`${target.id}:${p.trim()}`);
-          }
-        });
-      }
-    });
-  });
-
-  const cacheEntries = await prisma.normalizationCache.findMany({
-    where: {
-      OR: Array.from(cacheLookupSet).map((pair) => {
-        const [attrId, clean] = pair.split(":");
-        return { attributeId: attrId, cleanedValue: clean };
-      }),
-    },
-  });
-
-  return new Map(
-    cacheEntries.map((e) => [
-      `${e.attributeId}:${e.cleanedValue}`,
-      e.normalized,
-    ]),
-  );
-};
-
-export const getCacheMapFromValues = async (
   targets: (MappingTarget | null)[],
   valuesByItem: Map<string, string[]>,
   typeMap: Map<string, DataType>,
