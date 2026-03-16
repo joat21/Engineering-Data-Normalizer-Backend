@@ -11,9 +11,10 @@ export const aiParseTargetSchema = z.object({
 export const aiParseSchema = z.object({
   body: z.object({
     importSessionId: z.uuid(),
+    parsingSessionId: z.uuid().optional(),
     colIndex: z.number(),
     targets: z.array(aiParseTargetSchema),
-    testRowIds: z.array(z.uuid()).optional(),
+    testRowIds: z.array(z.uuid()).min(1),
   }),
 });
 

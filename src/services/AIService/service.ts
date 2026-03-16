@@ -7,28 +7,39 @@ import { TransformPayload } from "../NormalizationService/types";
 import { EditedAiParseResult, ParseTarget } from "./types";
 import { STAGING_IMPORT_ITEM_STATUS, TARGET_TYPE } from "../../config";
 
-export async function processAiParsing(data: {
+export const processAiParsing = async (data: {
   importSessionId: string;
+  parsingSessionId?: string;
   colIndex: number;
   targets: ParseTarget[];
-  testRowIds?: string[];
-}) {
-  const sessionId = uuidv4();
-  const { importSessionId, colIndex, targets, testRowIds } = data;
-  const isTest = !!testRowIds?.length;
+  testRowIds: string[];
+}) => {
+  const { importSessionId, parsingSessionId, colIndex, targets, testRowIds } =
+    data;
+
+  let sessionId;
+  const isTestRun = !parsingSessionId;
+
+  if (!parsingSessionId) {
+    const parsingSession = await prisma.aiParseSession.create({
+      data: { importSessionId },
+    });
+    sessionId = parsingSession.id;
+  } else {
+    sessionId = parsingSessionId;
+  }
 
   const where: Prisma.StagingImportItemWhereInput = {
     sessionId: importSessionId,
     status: {
       not: STAGING_IMPORT_ITEM_STATUS.EDITED_MANUALLY,
     },
+    id: isTestRun
+      ? { in: testRowIds }
+      : {
+          notIn: testRowIds,
+        },
   };
-
-  if (testRowIds?.length) {
-    where.id = {
-      in: testRowIds,
-    };
-  }
 
   const rows = await prisma.stagingImportItem.findMany({
     where,
@@ -66,13 +77,9 @@ export async function processAiParsing(data: {
     }
   }
 
-  // TODO: возможно стоит сделать так, чтобы тестовые строки сохранялись при тестовом прогоне,
-  // но не использовались при прогоне всей колонки
-  if (!isTest) {
-    await prisma.aiParseResult.createMany({
-      data: recordsToSave,
-    });
-  }
+  await prisma.aiParseResult.createMany({
+    data: recordsToSave,
+  });
 
   const headers = [
     { key: "sourceString", label: "Исходная строка" },
@@ -107,9 +114,9 @@ export async function processAiParsing(data: {
     parsingSessionId: sessionId,
     sourceColIndex: colIndex,
     headers,
-    rows: [...resultRows],
+    rows: resultRows,
   };
-}
+};
 
 export const editAiParseResults = async (
   parsingSessionId: string,
@@ -131,7 +138,7 @@ export const editAiParseResults = async (
   const payload = JSON.stringify(editedValues);
 
   const updated = await prisma.$executeRaw`
-    UPDATE "AiExtractionResult" AS t
+    UPDATE "AiParseResult" AS t
     SET
       "rawValue" = v."newRawValue"
     FROM json_to_recordset(${payload}::json) AS v(

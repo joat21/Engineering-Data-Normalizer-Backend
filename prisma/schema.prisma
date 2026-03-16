@@ -126,14 +126,15 @@ model ComparisonItem {
 }
 
 model ImportSession {
-  id         String              @id @default(uuid()) @db.Uuid
-  source     Source              @relation(fields: [sourceId], references: [id])
-  sourceId   String              @db.Uuid
-  category   Category            @relation(fields: [categoryId], references: [id])
-  categoryId String              @db.Uuid
-  createdAt  DateTime            @default(now()) @db.Timestamptz()
-  status     ImportStatus        @default(PENDING)
-  items      StagingImportItem[]
+  id              String              @id @default(uuid()) @db.Uuid
+  source          Source              @relation(fields: [sourceId], references: [id])
+  sourceId        String              @db.Uuid
+  category        Category            @relation(fields: [categoryId], references: [id])
+  categoryId      String              @db.Uuid
+  createdAt       DateTime            @default(now()) @db.Timestamptz()
+  status          ImportStatus        @default(PENDING)
+  items           StagingImportItem[]
+  aiParseSessions AiParseSession[]
 }
 
 model StagingImportItem {
@@ -160,14 +161,23 @@ model NormalizationCache {
   @@index([cleanedValue])
 }
 
+model AiParseSession {
+  id              String          @id @default(uuid()) @db.Uuid
+  importSession   ImportSession   @relation(fields: [importSessionId], references: [id])
+  importSessionId String          @db.Uuid
+  createdAt       DateTime        @default(now()) @db.Timestamptz()
+  aiParseResults  AiParseResult[]
+}
+
 model AiParseResult {
-  id           String            @id @default(uuid()) @db.Uuid
-  sourceItem   StagingImportItem @relation(fields: [sourceItemId], references: [id])
-  sourceItemId String            @db.Uuid
-  sessionId    String            @db.Uuid
-  targetType   MappingTargetType
-  targetKey    String
-  rawValue     String
+  id             String            @id @default(uuid()) @db.Uuid
+  aiParseSession AiParseSession    @relation(fields: [sessionId], references: [id])
+  sessionId      String            @db.Uuid
+  sourceItem     StagingImportItem @relation(fields: [sourceItemId], references: [id])
+  sourceItemId   String            @db.Uuid
+  targetType     MappingTargetType
+  targetKey      String
+  rawValue       String
 
   @@unique([sessionId, sourceItemId, targetKey])
 }

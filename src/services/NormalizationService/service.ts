@@ -136,5 +136,11 @@ export const applyAiParse = async (params: {
     cacheMap,
   );
 
-  return saveTransformedRows(dataToUpdate);
+  const result = await saveTransformedRows(dataToUpdate);
+
+  prisma.aiParseResult
+    .deleteMany({ where: { sessionId: parsingSessionId } })
+    .catch(console.error);
+
+  return result;
 };
