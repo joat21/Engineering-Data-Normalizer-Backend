@@ -3,11 +3,13 @@ import {
   applyColumnTransformation,
   mapColumnToAttribute,
   normalizeSingleEntity,
+  resolveNormalizationIssues,
 } from "../services/NormalizationService/service";
 import {
   applyTransformSchema,
   mapColToAttrSchema,
   normalizeSingleEntitySchema,
+  resolveNormalizationIssuesSchema,
   transformSchema,
 } from "../schemas/normalization";
 import { HandlerFromSchema } from "../types/zod";
@@ -103,6 +105,20 @@ export const normalizeSingleEntityHandler: HandlerFromSchema<
 > = async (req, res, next) => {
   try {
     const result = await normalizeSingleEntity(req.body);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resolveNormalizationIssuesHandler: HandlerFromSchema<
+  typeof resolveNormalizationIssuesSchema
+> = async (req, res, next) => {
+  try {
+    const result = await resolveNormalizationIssues({
+      importSessionId: req.params.sessionId,
+      ...req.body,
+    });
     res.json(result);
   } catch (error) {
     next(error);

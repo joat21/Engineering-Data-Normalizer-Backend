@@ -3,6 +3,7 @@ import { validate } from "../middleware/validate";
 import {
   applyTransformSchema,
   mapColToAttrSchema,
+  resolveNormalizationIssuesSchema,
 } from "../schemas/normalization";
 import * as NormalizationController from "../controllers/NormalizationController";
 
@@ -20,6 +21,12 @@ router.post(
   validate(applyTransformSchema),
   // Express типизирует req.params как ParamsDictionary, поэтому каст
   NormalizationController.applyTransformHandler as any,
+);
+
+router.patch(
+  "/:sessionId",
+  validate(resolveNormalizationIssuesSchema),
+  NormalizationController.resolveNormalizationIssuesHandler,
 );
 
 export default router;

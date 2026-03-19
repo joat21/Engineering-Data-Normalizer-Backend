@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { array, z } from "zod";
 import { SYSTEM_FIELD_KEYS, TARGET_TYPE, TRANSFORM_TYPE } from "../config";
 
 export const transformSchema = z.discriminatedUnion("type", [
@@ -32,7 +32,7 @@ export const applyTransformSchema = z.object({
     sessionId: z.uuid(),
   }),
   body: z.object({
-    colIndex: z.coerce.number(),
+    colIndex: z.number(),
     transform: transformSchema,
     targets: z.array(mappingTargetSchema.nullable()),
   }),
@@ -43,7 +43,7 @@ export const mapColToAttrSchema = z.object({
     sessionId: z.uuid(),
   }),
   body: z.object({
-    colIndex: z.coerce.number(),
+    colIndex: z.number(),
     target: mappingTargetSchema,
   }),
 });
@@ -57,5 +57,33 @@ export const normalizeSingleEntitySchema = z.object({
         value: z.string().nullable(),
       }),
     ),
+  }),
+});
+
+export const normalizedValueSchema = z.object({
+  valueString: z.string(),
+  valueMin: z.number().optional(),
+  valueMax: z.number().optional(),
+  valueArray: z.array(z.number()).optional(),
+  valueBoolean: z.boolean().optional(),
+});
+
+export const resolveNormalizationIssuesSchema = z.object({
+  params: z.object({
+    sessionId: z.uuid(),
+  }),
+  body: z.object({
+    colIndex: z.number(),
+    targets: z.array(mappingTargetSchema.nullable()),
+    resolutions: z.array(
+      z.object({
+        attributeId: z.uuid(),
+        rawValue: z.string(),
+        normalized: normalizedValueSchema,
+      }),
+    ),
+    sourceType: z.enum(["DIRECT", "AI_PARSE"]),
+    transform: transformSchema.optional(),
+    parsingSessionId: z.uuid().optional(),
   }),
 });

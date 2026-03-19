@@ -7,6 +7,7 @@ import { applyTransform } from "./transformers";
 import {
   MappingTarget,
   NormalizedResult,
+  NormalizedValue,
   NormalizeSingleEntity,
   TransformConfig,
 } from "./types";
@@ -21,12 +22,12 @@ export const mapColumnToAttribute = async (params: {
   colIndex: number;
   target: MappingTarget;
 }) =>
-  updateColumn(
-    params.sessionId,
-    params.colIndex,
-    [params.target],
-    (rawValue) => [rawValue],
-  );
+  updateColumn({
+    sessionId: params.sessionId,
+    colIndex: params.colIndex,
+    targets: [params.target],
+    getUpdatedData: (rawValue) => [rawValue],
+  });
 
 export const applyColumnTransformation = async (params: {
   sessionId: string;
@@ -34,16 +35,21 @@ export const applyColumnTransformation = async (params: {
   transform: TransformConfig;
   targets: (MappingTarget | null)[];
 }) =>
-  updateColumn(params.sessionId, params.colIndex, params.targets, (rawValue) =>
-    applyTransform(rawValue, params.transform),
-  );
+  updateColumn({
+    sessionId: params.sessionId,
+    colIndex: params.colIndex,
+    targets: params.targets,
+    getUpdatedData: (rawValue) => applyTransform(rawValue, params.transform),
+  });
 
-const updateColumn = async (
-  sessionId: string,
-  colIndex: number,
-  targets: (MappingTarget | null)[],
-  getUpdatedData: (rawValue: any) => any[],
-) => {
+const updateColumn = async (params: {
+  sessionId: string;
+  colIndex: number;
+  targets: (MappingTarget | null)[];
+  getUpdatedData: (rawValue: any) => any[];
+}) => {
+  const { sessionId, colIndex, targets, getUpdatedData } = params;
+
   const items = await prisma.stagingImportItem.findMany({
     where: { sessionId },
     select: { id: true, rawRow: true, transformedRow: true },
@@ -129,9 +135,11 @@ export const applyAiParse = async (params: {
     rawValueByItem,
   });
 
-  prisma.aiParseResult
-    .deleteMany({ where: { sessionId: parsingSessionId } })
-    .catch(console.error);
+  if (!result.issues.length) {
+    prisma.aiParseResult
+      .deleteMany({ where: { sessionId: parsingSessionId } })
+      .catch(console.error);
+  }
 
   return result;
 };
@@ -201,4 +209,69 @@ export const normalizeSingleEntity = async (params: {
   });
 
   return result;
+};
+
+export const resolveNormalizationIssues = async (params: {
+  importSessionId: string;
+  colIndex: number;
+  targets: (MappingTarget | null)[];
+  resolutions: {
+    attributeId: string;
+    rawValue: string;
+    normalized: NormalizedValue;
+  }[];
+  sourceType: "DIRECT" | "AI_PARSE";
+  transform?: TransformConfig;
+  parsingSessionId?: string;
+}) => {
+  const {
+    importSessionId,
+    colIndex,
+    targets,
+    resolutions,
+    sourceType,
+    transform,
+    parsingSessionId,
+  } = params;
+
+  const cacheData = resolutions.map((r) => ({
+    attributeId: r.attributeId,
+    rawValue: r.rawValue,
+    cleanedValue: r.rawValue.toLowerCase().trim(),
+    normalized: r.normalized as any,
+  }));
+
+  await prisma.normalizationCache.createMany({
+    data: cacheData,
+    skipDuplicates: true,
+  });
+
+  if (sourceType === "AI_PARSE" && parsingSessionId) {
+    return applyAiParse({
+      importSessionId,
+      parsingSessionId,
+      sourceColIndex: colIndex,
+      targets: targets.filter((t) => t !== null),
+    });
+  }
+
+  if (transform) {
+    return applyColumnTransformation({
+      sessionId: importSessionId,
+      colIndex,
+      transform,
+      targets,
+    });
+  }
+
+  const target = targets.find((t): t is MappingTarget => t !== null);
+  if (!target) {
+    throw new Error("Target must not be null");
+  }
+
+  return mapColumnToAttribute({
+    sessionId: importSessionId,
+    colIndex,
+    target,
+  });
 };

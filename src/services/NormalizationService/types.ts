@@ -2,6 +2,7 @@ import z from "zod";
 import { JsonValue } from "@prisma/client/runtime/client";
 import {
   attributeTargetSchema,
+  normalizedValueSchema,
   systemTargetSchema,
   transformSchema,
 } from "../../schemas/normalization";
@@ -21,13 +22,7 @@ export type TransformPayloadMap = {
     : undefined;
 };
 
-export interface NormalizedValue {
-  valueString: string;
-  valueMin?: number;
-  valueMax?: number;
-  valueArray?: number[];
-  valueBoolean?: boolean;
-}
+export type NormalizedValue = z.infer<typeof normalizedValueSchema>;
 
 export interface UnnormalizedValue {
   valueString: string;
