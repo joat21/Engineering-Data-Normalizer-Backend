@@ -1,9 +1,4 @@
-import {
-  buildSingleNormalizationContext,
-  buildTransformedRows,
-  saveTransformedRows,
-} from "./builders";
-import { applyTransform } from "./transformers";
+import { applyTransform } from "./transformation/transformers";
 import {
   MappingTarget,
   NormalizedResult,
@@ -15,7 +10,8 @@ import { prisma } from "../../../prisma/prisma";
 import { getRawValue } from "../../helpers/getRawValue";
 import { TARGET_TYPE } from "../../config";
 import { createSingleEquipment } from "../EquipmentService/service";
-import { enrichIssuesWithOptions } from "./helpers";
+import { buildSingleNormalizationContext } from "./normalization/context";
+import { executeUpdatePipeline } from "./transformation/executeUpdatePipeline";
 
 export const mapColumnToAttribute = async (params: {
   sessionId: string;
@@ -70,7 +66,7 @@ const updateColumn = async (params: {
     rawValueByItem.set(item.id, String(rawValue ?? ""));
   });
 
-  return processNormalizationPipeline({
+  return executeUpdatePipeline({
     items,
     colIndex,
     targets,
@@ -79,7 +75,7 @@ const updateColumn = async (params: {
   });
 };
 
-export const applyAiParse = async (params: {
+export const commitAiParsingResults = async (params: {
   importSessionId: string;
   parsingSessionId: string;
   sourceColIndex: number;
@@ -127,7 +123,7 @@ export const applyAiParse = async (params: {
     updatedValuesByItem.set(itemId, values);
   });
 
-  const result = await processNormalizationPipeline({
+  const result = await executeUpdatePipeline({
     items,
     colIndex: sourceColIndex,
     targets,
@@ -142,38 +138,6 @@ export const applyAiParse = async (params: {
   }
 
   return result;
-};
-
-export const processNormalizationPipeline = async (params: {
-  items: any[];
-  colIndex: number;
-  targets: (MappingTarget | null)[];
-  updatedValuesByItem: Map<string, string[]>;
-  rawValueByItem: Map<string, string>;
-}) => {
-  const { items, colIndex, targets, updatedValuesByItem, rawValueByItem } =
-    params;
-
-  const { transformedRows, issues: rawIssues } = await buildTransformedRows({
-    items,
-    colIndex,
-    updatedValuesByItem,
-    rawValueByItem,
-    targets,
-  });
-
-  if (transformedRows.length === 0) {
-    return { count: 0, issues: [] };
-  }
-
-  const issues = await enrichIssuesWithOptions(rawIssues);
-
-  await saveTransformedRows(transformedRows);
-
-  return {
-    count: transformedRows.length,
-    issues,
-  };
 };
 
 export const normalizeSingleEntity = async (params: {
@@ -247,7 +211,7 @@ export const resolveNormalizationIssues = async (params: {
   });
 
   if (sourceType === "AI_PARSE" && parsingSessionId) {
-    return applyAiParse({
+    return commitAiParsingResults({
       importSessionId,
       parsingSessionId,
       sourceColIndex: colIndex,

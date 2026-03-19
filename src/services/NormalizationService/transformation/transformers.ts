@@ -1,5 +1,5 @@
-import { TRANSFORM_TYPE } from "../../config";
-import { TransformConfig, TransformPayload } from "./types";
+import { TRANSFORM_TYPE } from "../../../config";
+import { TransformConfig, TransformPayload } from "../types";
 
 const numberRegex = /-?\d+(?:[.,]\d+)?/g;
 

@@ -41,20 +41,18 @@ export interface MappingPlan {
   ) => NormalizedValue | UnnormalizedValue;
 }
 
-export interface TransformedColumn {
+export interface NormalizedResult {
   target: MappingTarget;
   rawValue: string;
   normalized: NormalizedValue;
 }
 
-export type TransformedRow = Record<string, TransformedColumn[]>;
+export type TransformedRow = Record<string, NormalizedResult[]>;
 
 export type NormalizeSingleEntity = {
   target: MappingTarget;
   value: string | null | undefined;
 };
-
-export type NormalizedResult = TransformedColumn;
 
 export interface AttributeInfo {
   dataType: DataType;

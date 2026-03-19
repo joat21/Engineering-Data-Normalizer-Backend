@@ -1,8 +1,8 @@
 import { JsonValue } from "@prisma/client/runtime/client";
-import { parseNumbers } from "./transformers";
-import { NormalizedValue, UnnormalizedValue } from "./types";
-import { DataType } from "../../generated/prisma/enums";
-import { DATA_TYPE } from "../../config";
+import { parseNumbers } from "../transformation/transformers";
+import { NormalizedValue, UnnormalizedValue } from "../types";
+import { DataType } from "../../../generated/prisma/enums";
+import { DATA_TYPE } from "../../../config";
 
 export const normalizeValue = (
   rawValue: string,

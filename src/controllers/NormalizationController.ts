@@ -1,5 +1,5 @@
 import {
-  applyAiParse,
+  commitAiParsingResults,
   applyColumnTransformation,
   mapColumnToAttribute,
   normalizeSingleEntity,
@@ -74,7 +74,7 @@ export const saveAiParseHandler: HandlerFromSchema<
   typeof saveAiParseSchema
 > = async (req, res, next) => {
   try {
-    const result = await applyAiParse({
+    const result = await commitAiParsingResults({
       parsingSessionId: req.params.sessionId,
       importSessionId: req.body.importSessionId,
       sourceColIndex: req.body.sourceColIndex,
