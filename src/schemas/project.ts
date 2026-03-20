@@ -24,6 +24,12 @@ export const updateProjectSchema = z.object({
   }),
 });
 
+export const exportProjectToExcelSchema = z.object({
+  params: z.object({
+    id: z.uuid(),
+  }),
+});
+
 export const upsertProjectItemSchema = z.object({
   params: z.object({
     projectId: z.uuid(),

@@ -5,6 +5,7 @@ import * as ProjectController from "../controllers/ProjectController";
 import {
   createProjectSchema,
   deleteProjectItemSchema,
+  exportProjectToExcelSchema,
   getProjectByIdSchema,
   updateItemAmountSchema,
   updateProjectSchema,
@@ -31,6 +32,12 @@ router.patch(
   "/:id",
   validate(updateProjectSchema),
   ProjectController.updateProjectHandler,
+);
+
+router.get(
+  "/:id/xlsx",
+  validate(exportProjectToExcelSchema),
+  ProjectController.exportProjectToExcelHandler,
 );
 
 router.post(

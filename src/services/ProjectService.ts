@@ -1,4 +1,6 @@
+import ExcelJS from "exceljs";
 import { prisma } from "../../prisma/prisma";
+import { SYSTEM_FIELDS_CONFIG } from "../config";
 
 export const createProject = async (data: {
   name: string;
@@ -52,6 +54,85 @@ export const updateProject = async (
     where: { id: projectId },
     data,
   });
+};
+
+export const exportProjectToExcel = async (projectId: string) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: { items: { include: { equipment: true } } },
+  });
+
+  if (!project || project.items.length === 0) {
+    throw new Error("Project is empty or not found");
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Оборудование");
+
+  const columns = [
+    ...Object.entries(SYSTEM_FIELDS_CONFIG).map(([key, cfg]) => ({
+      header: cfg.label,
+      key: key,
+      width: 20,
+    })),
+    { header: "Кол-во", key: "amount", width: 10 },
+    { header: "Итого", key: "total", width: 15 },
+  ];
+
+  worksheet.columns = columns;
+
+  let grandTotal = 0;
+
+  project.items.forEach((item) => {
+    const itemPrice = Number(item.equipment.price || 0);
+    const rowTotal = item.amount * itemPrice;
+    grandTotal += rowTotal;
+
+    const rowData: any = {
+      amount: item.amount,
+      total: rowTotal === 0 ? "—" : rowTotal.toFixed(2),
+    };
+
+    Object.keys(SYSTEM_FIELDS_CONFIG).forEach((key) => {
+      const val = (item.equipment as any)[key];
+      rowData[key] =
+        val === null || val === undefined || val === "" ? "—" : val;
+    });
+
+    worksheet.addRow(rowData);
+  });
+
+  worksheet.addRow({});
+  const totalRow = worksheet.addRow({
+    [Object.keys(SYSTEM_FIELDS_CONFIG)[0]]: "ОБЩАЯ СТОИМОСТЬ ПРОЕКТА:",
+    total: grandTotal.toFixed(2),
+  });
+
+  const headerRow = worksheet.getRow(1);
+  headerRow.font = { bold: true };
+  headerRow.fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "F2F2F2" },
+  };
+
+  totalRow.font = { bold: true, size: 12 };
+  totalRow.getCell("total").alignment = { horizontal: "right" };
+
+  worksheet.eachRow((row) => {
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+
+  return { projectName: project.name, buffer };
 };
 
 export const upsertProjectItem = async (

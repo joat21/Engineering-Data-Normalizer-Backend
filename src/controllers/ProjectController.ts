@@ -1,7 +1,9 @@
 import { RequestHandler } from "express";
+import slugify from "slugify";
 import {
   createProjectSchema,
   deleteProjectItemSchema,
+  exportProjectToExcelSchema,
   getProjectByIdSchema,
   updateItemAmountSchema,
   updateProjectSchema,
@@ -10,6 +12,7 @@ import {
 import {
   createProject,
   deleteProjectItem,
+  exportProjectToExcel,
   getProjectById,
   getProjects,
   updateItemAmount,
@@ -58,6 +61,25 @@ export const updateProjectHandler: HandlerFromSchema<
     const result = await updateProject(req.params.id, req.body);
 
     res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const exportProjectToExcelHandler: HandlerFromSchema<
+  typeof exportProjectToExcelSchema
+> = async (req, res, next) => {
+  try {
+    const { projectName, buffer } = await exportProjectToExcel(req.params.id);
+    const fileName = `${slugify(projectName, "_")}.xlsx`;
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
+
+    return res.send(buffer);
   } catch (error) {
     next(error);
   }
