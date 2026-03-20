@@ -19,7 +19,7 @@ model Project {
   id          String        @id @default(uuid()) @db.Uuid
   name        String
   description String
-  isArchived  Boolean
+  isArchived  Boolean       @default(false)
   items       ProjectItem[]
 }
 
@@ -31,6 +31,8 @@ model ProjectItem {
   equipmentId String    @db.Uuid
   amount      Int       @db.SmallInt
   updatedAt   DateTime  @default(now()) @db.Timestamptz()
+
+  @@unique([projectId, equipmentId])
 }
 
 model Equipment {
