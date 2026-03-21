@@ -7,3 +7,5 @@ prisma/migration_lock.toml
 prisma/scripts
 /src/generated/prisma
 clear.sql
+
+hash.js

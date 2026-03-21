@@ -218,8 +218,6 @@ const callLlmParser = async (
     ${lines.map((l) => `${l.id}: ${l.text}`).join("\n")}
   `;
 
-  console.log(prompt);
-
   const response = await ai.models.generateContent({
     model: "gemini-3.1-flash-lite-preview",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -240,8 +238,6 @@ const callLlmParser = async (
     `[LOG]: ${new Date(Date.now()).toLocaleString()}\nTOKENS USAGE:`,
     response.usageMetadata,
   );
-
-  console.log(response.text);
 
   return JSON.parse(response.text || "") as AiParseResult[];
 };
