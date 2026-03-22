@@ -6,7 +6,7 @@ import {
   updateCacheFromNormalizedData,
 } from "./helpers";
 import { FilterValue, NumericFilterValue } from "./types";
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import { Prisma } from "../../generated/prisma/client";
 import { NormalizedData, TransformedRow } from "../NormalizationService/types";
 import { DATA_TYPE, IMPORT_SESSION_STATUS, TARGET_TYPE } from "../../config";

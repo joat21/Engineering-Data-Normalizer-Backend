@@ -1,5 +1,5 @@
 import { SourceType } from "../generated/prisma/enums";
-import { prisma } from "../../prisma/prisma";
+import { prisma } from "../prisma";
 
 export const createSource = async (data: {
   fileName: string;

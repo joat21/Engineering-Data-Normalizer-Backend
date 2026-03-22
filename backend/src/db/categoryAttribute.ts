@@ -1,4 +1,4 @@
-import { prisma } from "../../prisma/prisma";
+import { prisma } from "../prisma";
 import { TARGET_TYPE } from "../config";
 import { Prisma } from "../generated/prisma/client";
 import {

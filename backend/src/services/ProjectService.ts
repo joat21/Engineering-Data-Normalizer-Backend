@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import { prisma } from "../../prisma/prisma";
+import { prisma } from "../prisma";
 import { SYSTEM_FIELDS_CONFIG } from "../config";
 
 export const createProject = async (data: {

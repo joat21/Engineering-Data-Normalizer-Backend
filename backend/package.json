@@ -23,7 +23,8 @@
     "nodemon": "^3.1.14",
     "slugify": "^1.6.8",
     "uuid": "^13.0.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@engineering-data-normalizer/shared": "*"
   },
   "devDependencies": {
     "@prisma/adapter-pg": "^7.4.2",

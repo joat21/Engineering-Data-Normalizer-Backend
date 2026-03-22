@@ -5,7 +5,7 @@ import {
   NormalizationOption,
   NormalizedValue,
 } from "./types";
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import { DATA_TYPE, TARGET_TYPE } from "../../config";
 import { booleanNormalizationOptions } from "./config";
 import { getTargetKey } from "../../helpers/getTargetKey";

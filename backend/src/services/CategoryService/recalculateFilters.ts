@@ -1,7 +1,7 @@
 import { DATA_TYPE, SYSTEM_FIELDS_CONFIG } from "../../config";
 import { EquipmentSystemFields } from "../../types";
 import { Prisma } from "../../generated/prisma/client";
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 
 export const recalculateFilters = async (categoryId: string) => {
   const category = await prisma.category.findUnique({

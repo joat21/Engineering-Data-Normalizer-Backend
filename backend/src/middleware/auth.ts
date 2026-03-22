@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { verifyAndRefreshTokens } from "../helpers/tokens";
-import { prisma } from "../../prisma/prisma";
+import { prisma } from "../prisma";
 
 export const authTokensHandler: RequestHandler = async (req, res, next) => {
   const accessToken = req.cookies?.accessToken;

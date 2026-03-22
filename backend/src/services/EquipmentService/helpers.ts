@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import {
   DATA_TYPE,
   SYSTEM_FIELD_KEYS,

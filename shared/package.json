@@ -1,0 +1,17 @@
+{
+  "name": "@engineering-data-normalizer/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.ts",
+      "default": "./index.ts"
+    }
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

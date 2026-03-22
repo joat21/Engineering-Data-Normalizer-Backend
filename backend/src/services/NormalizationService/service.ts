@@ -6,7 +6,7 @@ import {
   NormalizeSingleEntity,
   TransformConfig,
 } from "./types";
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import { getRawValue } from "../../helpers/getRawValue";
 import { TARGET_TYPE } from "../../config";
 import { createEquipment } from "../EquipmentService/service";

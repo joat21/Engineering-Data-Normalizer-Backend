@@ -5,7 +5,7 @@ import {
   MappingTarget,
   NormalizeSingleEntity,
 } from "../types";
-import { prisma } from "../../../../prisma/prisma";
+import { prisma } from "../../../prisma";
 import { DATA_TYPE, TARGET_TYPE } from "../../../config";
 import { normalizeValue } from "./normalizers";
 import { cleanValue } from "../../../helpers/cleanValue";

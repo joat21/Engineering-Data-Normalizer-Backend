@@ -1,6 +1,6 @@
 import { GoogleGenAI, Schema, ThinkingLevel, Type } from "@google/genai";
 import { v4 as uuidv4 } from "uuid";
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import { Prisma } from "../../generated/prisma/client";
 import { getRawValue } from "../../helpers/getRawValue";
 import { TransformPayload } from "../NormalizationService/types";

@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import bcrypt from "bcrypt";
-import { prisma } from "../../prisma/prisma";
-import { loginSchema } from "../schemas/auth";
+import { loginSchema } from "@engineering-data-normalizer/shared";
+import { prisma } from "../prisma";
 import { HandlerFromSchema } from "../types/zod";
 import { signToken } from "../helpers/tokens";
 import { cookieOptions } from "../config";

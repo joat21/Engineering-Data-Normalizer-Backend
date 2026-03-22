@@ -1,4 +1,4 @@
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import { calculateHashAsync } from "../../helpers/calculateHashAsync";
 import { uploadFile } from "../S3Service";
 import { createSource } from "../SourceService";

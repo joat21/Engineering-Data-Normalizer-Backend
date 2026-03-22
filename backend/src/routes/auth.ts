@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { loginSchema } from "@engineering-data-normalizer/shared";
 import * as AuthController from "../controllers/AuthController";
 import {
   authTokensHandler,
@@ -6,7 +7,6 @@ import {
   requireAuth,
 } from "../middleware/auth";
 import { validate } from "../middleware/validate";
-import { loginSchema } from "../schemas/auth";
 
 const router = Router();
 

@@ -6,7 +6,7 @@ import {
   MappingTarget,
   TransformedRow,
 } from "../types";
-import { prisma } from "../../../../prisma/prisma";
+import { prisma } from "../../../prisma";
 import { DATA_TYPE, TARGET_TYPE } from "../../../config";
 import { buildBatchNormalizationContext } from "../normalization/context";
 import { getTargetKey } from "../../../helpers/getTargetKey";

@@ -1,4 +1,4 @@
-import { prisma } from "../../prisma/prisma";
+import { prisma } from "../prisma";
 import { SYSTEM_FIELDS_CONFIG } from "../config";
 import { EquipmentSystemFields } from "../types";
 

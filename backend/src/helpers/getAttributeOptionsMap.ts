@@ -3,7 +3,7 @@ import {
   NormalizationOption,
   NormalizedValue,
 } from "../services/NormalizationService/types";
-import { prisma } from "../../prisma/prisma";
+import { prisma } from "../prisma";
 
 export const getAttributeOptionsMap = async (
   attributeIds: string[],

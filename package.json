@@ -1,0 +1,9 @@
+{
+  "name": "engineering-data-normalizer",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "shared"
+  ]
+}

@@ -1,4 +1,4 @@
-import { prisma } from "../../../prisma/prisma";
+import { prisma } from "../../prisma";
 import { DATA_TYPE, SYSTEM_FIELDS_CONFIG } from "../../config";
 import { getAttributeOptionsMap } from "../../helpers/getAttributeOptionsMap";
 import { booleanNormalizationOptions } from "../NormalizationService/config";
