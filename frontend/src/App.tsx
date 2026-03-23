@@ -4,6 +4,7 @@ import { RequireAuth } from "./router/RequireAuth";
 import { LoginPage } from "@/pages/login";
 import { ImportPage } from "@/pages/import";
 import { SingleImportPage } from "@/pages/single-import";
+import { CatalogImportPage } from "@/pages/catelog-import";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
 
           <Route path="/import">
             <Route index element={<ImportPage />} />
-            <Route path="catalog" element={<h1>Catalog</h1>} />
+            <Route path="catalog" element={<CatalogImportPage />} />
             <Route path="single" index element={<SingleImportPage />} />
           </Route>
         </Route>

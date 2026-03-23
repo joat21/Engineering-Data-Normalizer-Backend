@@ -8,10 +8,10 @@ import {
 
 export const InitSingleImport = () => {
   const { setInitialData, setSessionId, setStep } = useImportStore();
-  const mutation = useInitImportMutation();
+  const initImportMutation = useInitImportMutation();
 
   const handleInit = (data: { file: File; categoryId: string }) => {
-    mutation.mutate(
+    initImportMutation.mutate(
       { ...data, sourceType: SourceType.SINGLE_ITEM },
       {
         onSuccess: (res) => {
@@ -24,6 +24,9 @@ export const InitSingleImport = () => {
   };
 
   return (
-    <InitImportForm onSubmit={handleInit} isLoading={mutation.isPending} />
+    <InitImportForm
+      onSubmit={handleInit}
+      isLoading={initImportMutation.isPending}
+    />
   );
 };

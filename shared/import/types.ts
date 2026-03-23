@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { initImportSchema } from "./schemas";
+import { importRowsSchema, initImportSchema } from "./schemas";
 
 export const SourceType = {
   CATALOG: "CATALOG",
@@ -9,3 +9,6 @@ export const SourceType = {
 export type SourceType = (typeof SourceType)[keyof typeof SourceType];
 
 export type InitImportBody = z.infer<typeof initImportSchema.shape.body>;
+
+export type ImportRowsParams = z.infer<typeof importRowsSchema.shape.params>;
+export type ImportRowsBody = z.infer<typeof importRowsSchema.shape.body>;
