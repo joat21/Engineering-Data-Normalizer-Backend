@@ -1,18 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import type {
-  Category,
-  InitImportBody,
-} from "@engineering-data-normalizer/shared";
-import { api } from "../../../shared/api/base";
-
-export const getCategories = () =>
-  api.get<Category[]>("/categories").then((r) => r.data);
-
-export const useCategories = () =>
-  useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-  });
+import { useMutation } from "@tanstack/react-query";
+import type { InitImportBody } from "@engineering-data-normalizer/shared";
+import { api } from "@/shared/api/base";
 
 interface InitImportArgs extends InitImportBody {
   file: File;

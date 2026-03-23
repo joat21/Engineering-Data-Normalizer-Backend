@@ -1,6 +1,5 @@
-import { SourceType } from "@engineering-data-normalizer/shared";
+import { InitSingleImport } from "./InitSingleImport";
 import { SingleImportForm } from "./SingleImportForm";
-import { InitImport } from "@/widgets/init-import/ui/InitImport";
 import { SingleImportStep, useImportStore } from "@/features/import";
 import { useCategoryAttributes } from "@/entities/category-attribute";
 
@@ -10,9 +9,7 @@ export const SingleImportPage = () => {
 
   return (
     <div className="flex justify-center items-center w-full">
-      {step === SingleImportStep.TYPE_SELECTION && (
-        <InitImport sourceType={SourceType.SINGLE_ITEM} />
-      )}
+      {step === SingleImportStep.TYPE_SELECTION && <InitSingleImport />}
 
       {step === SingleImportStep.FILL_ATTRIBUTES && (
         <SingleImportForm attributes={categoryAttributes} />
