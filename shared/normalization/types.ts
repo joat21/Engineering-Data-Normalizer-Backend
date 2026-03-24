@@ -3,6 +3,7 @@ import { DataType } from "../category";
 import { SYSTEM_FIELDS_CONFIG } from "./constants";
 import {
   attributeTargetSchema,
+  mapColToAttrSchema,
   normalizedDataSchema,
   normalizedValueSchema,
   systemTargetSchema,
@@ -38,3 +39,8 @@ export const TransformType = {
 } as const;
 
 export type TransformType = (typeof TransformType)[keyof typeof TransformType];
+
+export type MapColToAttrParams = z.infer<
+  typeof mapColToAttrSchema.shape.params
+>;
+export type MapColToAttrBody = z.infer<typeof mapColToAttrSchema.shape.body>;

@@ -1,3 +1,8 @@
+import type {
+  StagingColumn,
+  StagingRow,
+} from "@engineering-data-normalizer/shared";
+
 export const SingleImportStep = {
   TYPE_SELECTION: "TYPE_SELECTION",
   FILL_ATTRIBUTES: "FILL_ATTRIBUTES",
@@ -16,3 +21,8 @@ export const CatalogImportStep = {
 
 export type CatalogImportStep =
   (typeof CatalogImportStep)[keyof typeof CatalogImportStep];
+
+export type StagingTable = {
+  columns: StagingColumn[];
+  rows: StagingRow[];
+};

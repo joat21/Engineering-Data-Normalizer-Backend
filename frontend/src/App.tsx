@@ -5,6 +5,7 @@ import { LoginPage } from "@/pages/login";
 import { ImportPage } from "@/pages/import";
 import { SingleImportPage } from "@/pages/single-import";
 import { CatalogImportPage } from "@/pages/catelog-import";
+import { MapColumns } from "./pages/catelog-import/ui/MapColumns";
 
 function App() {
   return (
@@ -18,8 +19,15 @@ function App() {
           <Route path="/import">
             <Route index element={<ImportPage />} />
             <Route path="catalog" element={<CatalogImportPage />} />
-            <Route path="single" index element={<SingleImportPage />} />
+            <Route path="single" element={<SingleImportPage />} />
           </Route>
+
+          <Route
+            path="mapping"
+            element={
+              <MapColumns sessionId="72fe9398-a4a7-4b19-9b16-dbbd4aa7b0bc" />
+            }
+          />
         </Route>
       </Route>
     </Routes>

@@ -1,11 +1,15 @@
-import { SourceType } from "@engineering-data-normalizer/shared";
+import {
+  StagingColumn,
+  SourceType,
+  StagingRow,
+} from "@engineering-data-normalizer/shared";
 import { prisma } from "../../prisma";
 import { calculateHashAsync } from "../../helpers/calculateHashAsync";
 import { uploadFile } from "../S3Service";
 import { createSource } from "../SourceService";
 import { TransformedRow } from "../NormalizationService/types";
 import { getAttributeInfoMap } from "../../db/categoryAttribute";
-import { ColumnMetadata, isSubColumn } from "./types";
+import { isSubColumn } from "./types";
 import { getTargetLabel } from "./helpers";
 
 export const createSession = async (data: {
@@ -85,7 +89,7 @@ export const getStagingTable = async (sessionId: string) => {
 
   const attributeInfoMap = await getAttributeInfoMap(allTargets);
 
-  const columns: ColumnMetadata[] = rawRow.flatMap((_, index) => {
+  const columns: StagingColumn[] = rawRow.flatMap((_, index) => {
     const mappings = transformedRow[index] || [];
 
     if (mappings.length === 0) {
@@ -116,7 +120,7 @@ export const getStagingTable = async (sessionId: string) => {
     }));
   });
 
-  const rows = items.map((item) => {
+  const rows: StagingRow[] = items.map((item) => {
     const rawRow = item.rawRow as any[];
     const transformedRow =
       (item.transformedRow as unknown as TransformedRow) || {};

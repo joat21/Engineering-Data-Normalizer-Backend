@@ -24,7 +24,7 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
   const initImportMutation = useInitImportMutation();
   const importRowsMutation = useImportRowsMutation();
 
-  const { file } = useImportStore();
+  const { file, setSessionId } = useImportStore();
   const [data, setData] = useState<any[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,6 +101,8 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
         sourceType: SourceType.CATALOG,
         originHeader: headers,
       });
+
+      setSessionId(sessionId);
 
       importRowsMutation.mutate(
         { sessionId, rows: body },

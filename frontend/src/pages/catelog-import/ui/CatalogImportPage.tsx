@@ -5,13 +5,22 @@ import { InitTable } from "./InitTable";
 export const CatalogImportPage = () => {
   const { step, categoryId } = useImportStore();
 
+  const renderContent = () => {
+    switch (step) {
+      case CatalogImportStep.TYPE_SELECTION:
+        return <InitCatalogImport />;
+
+      case CatalogImportStep.INIT_TABLE:
+        return <InitTable categoryId={categoryId ?? ""} />;
+
+      case CatalogImportStep.MAP_COLUMNS:
+        return "Ты думал тут что то будет?";
+    }
+  };
+
   return (
     <div className="flex justify-center items-center w-full">
-      {step === CatalogImportStep.TYPE_SELECTION && <InitCatalogImport />}
-
-      {step === CatalogImportStep.INIT_TABLE && (
-        <InitTable categoryId={categoryId ?? ""} />
-      )}
+      {renderContent()}
     </div>
   );
 };
