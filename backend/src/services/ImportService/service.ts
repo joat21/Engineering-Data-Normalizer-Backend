@@ -17,27 +17,42 @@ export const createSession = async (data: {
   sourceType: SourceType;
   file: Express.Multer.File;
   originHeader?: string[];
+  manufacturerId?: string;
+  supplierId?: string;
 }) => {
-  const fileHash = await calculateHashAsync(data.file.buffer);
+  const {
+    categoryId,
+    sourceType,
+    file,
+    originHeader,
+    manufacturerId,
+    supplierId,
+  } = data;
+
+  const fileHash = await calculateHashAsync(file.buffer);
   let source = await prisma.source.findUnique({
     where: { fileHash },
   });
 
   if (!source) {
-    const url = await uploadFile(data.file);
+    const url = await uploadFile(file, fileHash);
     source = await createSource({
-      fileName: data.file.originalname,
+      fileName: file.originalname,
       url,
       fileHash,
-      type: data.sourceType,
+      type: sourceType,
+      manufacturerId,
+      supplierId,
     });
   }
 
   const session = await prisma.importSession.create({
     data: {
-      categoryId: data.categoryId,
+      categoryId: categoryId,
       sourceId: source.id,
-      originHeader: data.originHeader,
+      originHeader: originHeader,
+      manufacturerId,
+      supplierId,
     },
   });
 

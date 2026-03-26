@@ -1,5 +1,4 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { v4 as uuidv4 } from "uuid";
 
 const s3 = new S3Client({
   region: "ru-central1",
@@ -10,9 +9,11 @@ const s3 = new S3Client({
   },
 });
 
-export const uploadFile = async (file: Express.Multer.File) => {
-  const id = uuidv4();
-  const key = `imports/${id}-${file.originalname}`;
+export const uploadFile = async (
+  file: Express.Multer.File,
+  fileHash: string,
+) => {
+  const key = `imports/${fileHash}-${file.originalname}`;
   const bucketName = process.env.BUCKET_NAME;
 
   const command = new PutObjectCommand({

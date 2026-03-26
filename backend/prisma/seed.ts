@@ -15,6 +15,15 @@ async function main() {
   await prisma.categoryAttribute.deleteMany();
   await prisma.category.deleteMany();
 
+  await prisma.manufacturer.createMany({
+    data: [{ name: "Wilo" }, { name: "Grandfar" }],
+    skipDuplicates: true,
+  });
+  await prisma.supplier.createMany({
+    data: [{ name: "Михалыч" }, { name: "Петрович" }],
+    skipDuplicates: true,
+  });
+
   const pumps = await prisma.category.create({
     data: {
       name: "Насосы",

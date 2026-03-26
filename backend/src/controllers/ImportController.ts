@@ -14,7 +14,8 @@ export const initImportHandler: HandlerFromSchema<
   typeof initImportSchema
 > = async (req, res, next) => {
   try {
-    const { categoryId, sourceType, originHeader } = req.body;
+    const { categoryId, sourceType, originHeader, manufacturerId, supplierId } =
+      req.body;
     const file = req.file;
 
     if (!file) {
@@ -26,6 +27,8 @@ export const initImportHandler: HandlerFromSchema<
       sourceType,
       file,
       originHeader,
+      manufacturerId,
+      supplierId,
     });
 
     res.json({ sessionId });

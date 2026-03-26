@@ -2,7 +2,8 @@ import { DataType } from "../category";
 
 export const SYSTEM_FIELDS_CONFIG = {
   name: { label: "Название", type: DataType.STRING },
-  manufacturer: { label: "Производитель", type: DataType.STRING },
+  manufacturerName: { label: "Производитель", type: DataType.STRING },
+  supplierName: { label: "Поставщик", type: DataType.STRING },
   article: { label: "Артикул", type: DataType.STRING },
   model: { label: "Модель", type: DataType.STRING },
   externalCode: { label: "Код", type: DataType.STRING },

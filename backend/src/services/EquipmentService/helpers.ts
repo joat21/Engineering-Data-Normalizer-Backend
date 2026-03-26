@@ -84,7 +84,8 @@ export const collectEquipmentAndAttributes = (data: {
     article: null,
     model: null,
     externalCode: null,
-    manufacturer: null,
+    manufacturerName: null,
+    supplierName: null,
     price: new Prisma.Decimal(0),
   };
 
