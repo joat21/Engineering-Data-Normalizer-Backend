@@ -3,9 +3,11 @@ import { Button, Input, Modal, type Key } from "@heroui/react";
 import {
   MappingTargetType,
   parseNumbers,
+  PrevActionType,
   TransformType,
   type MappingTarget,
 } from "@engineering-data-normalizer/shared";
+import { useTransformationContextStore } from "../model/store";
 import type { TransformationDialogProps } from "../model/types";
 import { useApplyTransformMutation } from "@/features/import";
 import { AppSelect } from "@/shared/ui";
@@ -17,6 +19,10 @@ export const ExtractNumbersDialog = ({
   sessionId,
   onClose,
 }: TransformationDialogProps) => {
+  const setNormalizationContext = useTransformationContextStore(
+    (s) => s.setNormalizationContext,
+  );
+
   const sourceValue = rows[0]?.values[column.id] || "";
   const extractedNumbers = parseNumbers(sourceValue);
 
@@ -47,7 +53,19 @@ export const ExtractNumbersDialog = ({
     };
 
     applyTransformMutation.mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
+        if (data.issues.length > 0) {
+          setNormalizationContext({
+            issues: data.issues,
+            metadata: {
+              sessionId: variables.sessionId,
+              colIndex: variables.colIndex,
+              targets: variables.targets,
+              prevActionType: PrevActionType.DIRECT,
+            },
+          });
+        }
+
         onClose();
       },
     });

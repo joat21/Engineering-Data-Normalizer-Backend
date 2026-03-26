@@ -1,6 +1,7 @@
 import { Checkbox, type Key } from "@heroui/react";
 import {
   MappingTargetType,
+  PrevActionType,
   type CategoryAttribute,
   type MappingTarget,
   type StagingColumn,
@@ -31,6 +32,9 @@ export const TableHeader = ({
 
   const setContext = useTransformationContextStore((s) => s.setContext);
   const isSelecting = useTransformationContextStore((s) => s.isSelecting);
+  const setNormalizationContext = useTransformationContextStore(
+    (s) => s.setNormalizationContext,
+  );
 
   const handleSelectAttribute = useCallback(
     (col: StagingColumn, value: Key | null) => {
@@ -42,7 +46,24 @@ export const TableHeader = ({
           ? { type: MappingTargetType.ATTRIBUTE, id: attr.id }
           : { type: MappingTargetType.SYSTEM, field: attr.id as any };
 
-      mappingMutation.mutate({ sessionId, colIndex: col.originIndex, target });
+      mappingMutation.mutate(
+        { sessionId, colIndex: col.originIndex, target },
+        {
+          onSuccess: (data, variables) => {
+            if (data.issues.length === 0) return;
+
+            setNormalizationContext({
+              issues: data.issues,
+              metadata: {
+                sessionId: variables.sessionId,
+                colIndex: variables.colIndex,
+                targets: [variables.target],
+                prevActionType: PrevActionType.DIRECT,
+              },
+            });
+          },
+        },
+      );
     },
     [attributes, mappingMutation, sessionId],
   );

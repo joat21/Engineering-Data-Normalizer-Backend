@@ -5,6 +5,7 @@ import { TableHeader } from "./TableHeader";
 import { TransformModalManager } from "./TransformModalManager";
 import { useStagingTable } from "@/features/import";
 import { useCategoryAttributes } from "@/entities/category-attribute";
+import { ResolveNormalizationIssuesModal } from "./ResolveNormalizationIssuesModal";
 
 interface MapColumnsProps {
   sessionId: string;
@@ -34,6 +35,8 @@ export const MapColumns = ({ sessionId }: MapColumnsProps) => {
       </table>
 
       <RowsSelectionPanel />
+
+      <ResolveNormalizationIssuesModal />
 
       <TransformModalManager
         attributes={attributes}

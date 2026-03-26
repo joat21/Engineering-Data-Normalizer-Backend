@@ -21,7 +21,7 @@ export const SingleImportForm = ({ attributes }: SingleImportFormProps) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    const { sessionId } = useImportStore.getState();
+    const sessionId = useImportStore.getState().sessionId;
 
     const normalizedData = attributes?.map((attr) => {
       const target: MappingTarget =

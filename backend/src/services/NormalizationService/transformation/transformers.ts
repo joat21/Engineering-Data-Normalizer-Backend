@@ -2,10 +2,10 @@ import {
   multiplyNumbersInString,
   parseNumbers,
   splitBySeparator,
+  TransformConfig,
   TransformPayload,
   TransformType,
 } from "@engineering-data-normalizer/shared";
-import { TransformConfig } from "../types";
 
 export const applyTransform = (
   value: TransformPayload,

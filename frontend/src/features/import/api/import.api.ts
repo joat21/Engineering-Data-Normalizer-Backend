@@ -10,6 +10,9 @@ import type {
   InitImportBody,
   MapColToAttrBody,
   MapColToAttrParams,
+  MapTransformResult,
+  ResolveNormalizationIssuesBody,
+  ResolveNormalizationIssuesParams,
   SaveAiParseResultsBody,
   SaveAiParseResultsParams,
   StagingTable,
@@ -66,7 +69,7 @@ export const useStagingTable = (data: GetStagingTableParams) =>
 
 export const mapping = (data: MapColToAttrParams & MapColToAttrBody) =>
   api
-    .post(`/import-sessions/${data.sessionId}/mapping`, {
+    .post<MapTransformResult>(`/import-sessions/${data.sessionId}/mapping`, {
       colIndex: data.colIndex,
       target: data.target,
     })
@@ -90,7 +93,7 @@ export const applyTransform = (
   data: ApplyTransformParams & ApplyTransformBody,
 ) =>
   api
-    .post(`/import-sessions/${data.sessionId}/transform`, {
+    .post<MapTransformResult>(`/import-sessions/${data.sessionId}/transform`, {
       colIndex: data.colIndex,
       transform: data.transform,
       targets: data.targets,
@@ -122,7 +125,10 @@ export const useApplyAiParseMutation = () =>
 
 export const saveAiParseResults = (
   data: SaveAiParseResultsParams & SaveAiParseResultsBody,
-) => api.post(`/ai-parse/${data.sessionId}/commit`, data).then((r) => r.data);
+) =>
+  api
+    .post<MapTransformResult>(`/ai-parse/${data.sessionId}/commit`, data)
+    .then((r) => r.data);
 
 export const useSaveAiParseResultsMutation = () => {
   const queryClient = useQueryClient();
@@ -133,6 +139,27 @@ export const useSaveAiParseResultsMutation = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["import", "staging-table", variables.importSessionId],
+      });
+    },
+  });
+};
+
+export const resolveNormalizationIssues = (
+  data: ResolveNormalizationIssuesParams & ResolveNormalizationIssuesBody,
+) =>
+  api
+    .patch<MapTransformResult>(`/import-sessions/${data.sessionId}`, data)
+    .then((r) => r.data);
+
+export const useResolveNormalizationIssuesMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["normalization-issues", "resolve"],
+    mutationFn: resolveNormalizationIssues,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["import", "staging-table", variables.sessionId],
       });
     },
   });

@@ -1,4 +1,3 @@
-import z from "zod";
 import { JsonValue } from "@prisma/client/runtime/client";
 import {
   DataType,
@@ -6,10 +5,8 @@ import {
   NormalizedData,
   NormalizedValue,
   TransformType,
-  transformConfigSchema,
+  TransformConfig,
 } from "@engineering-data-normalizer/shared";
-
-export type TransformConfig = z.infer<typeof transformConfigSchema>;
 
 export type TransformPayloadMap = {
   [T in TransformType]: Extract<TransformConfig, { type: T }> extends {
@@ -50,20 +47,3 @@ export const isNormalizedValue = (
 ): val is NormalizedValue => {
   return !(val as UnnormalizedValue).needsCheck;
 };
-
-export type EnrichedTarget = MappingTarget & {
-  label: string;
-  dataType: DataType;
-};
-
-export interface NormalizationOption {
-  id: string;
-  label: string;
-  normalized: NormalizedValue;
-}
-
-export interface NormalizationIssue {
-  target: EnrichedTarget;
-  unnormalizedValues: string[];
-  normalizationOptions: NormalizationOption[];
-}

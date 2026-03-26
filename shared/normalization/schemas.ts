@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { SYSTEM_FIELD_KEYS } from "./constants";
-import { MappingTargetType, TransformType } from "./types";
+import { MappingTargetType, PrevActionType, TransformType } from "./types";
 
 export const normalizedValueSchema = z.object({
   valueString: z.string(),
@@ -83,7 +83,7 @@ export const resolveNormalizationIssuesSchema = z.object({
     colIndex: z.number(),
     targets: z.array(mappingTargetSchema.nullable()),
     resolutions: z.array(normalizedDataSchema),
-    sourceType: z.enum(["DIRECT", "AI_PARSE"]),
+    prevActionType: z.enum(PrevActionType),
     transform: transformConfigSchema.optional(),
     parsingSessionId: z.uuid().optional(),
   }),

@@ -1,13 +1,14 @@
 import { z } from "zod";
 import { DataType } from "../category";
-import { SYSTEM_FIELDS_CONFIG } from "./constants";
 import {
   applyTransformSchema,
   attributeTargetSchema,
   mapColToAttrSchema,
   normalizedDataSchema,
   normalizedValueSchema,
+  resolveNormalizationIssuesSchema,
   systemTargetSchema,
+  transformConfigSchema,
 } from "./schemas";
 
 export type NormalizedValue = z.infer<typeof normalizedValueSchema>;
@@ -25,14 +26,6 @@ export const MappingTargetType = {
 export type MappingTargetType =
   (typeof MappingTargetType)[keyof typeof MappingTargetType];
 
-export type EquipmentSystemFieldsDTO = {
-  [K in keyof typeof SYSTEM_FIELDS_CONFIG]: (typeof SYSTEM_FIELDS_CONFIG)[K]["type"] extends typeof DataType.NUMBER
-    ? number
-    : (typeof SYSTEM_FIELDS_CONFIG)[K]["type"] extends typeof DataType.BOOLEAN
-      ? boolean
-      : string;
-};
-
 export type TransformPayload = string | number | null;
 
 export const TransformType = {
@@ -42,6 +35,38 @@ export const TransformType = {
 } as const;
 
 export type TransformType = (typeof TransformType)[keyof typeof TransformType];
+
+export type TransformConfig = z.infer<typeof transformConfigSchema>;
+
+export type EnrichedTarget = MappingTarget & {
+  label: string;
+  dataType: DataType;
+};
+
+export interface NormalizationOption {
+  id: string;
+  label: string;
+  normalized: NormalizedValue;
+}
+
+export interface NormalizationIssue {
+  target: EnrichedTarget;
+  unnormalizedValues: string[];
+  normalizationOptions: NormalizationOption[];
+}
+
+export interface MapTransformResult {
+  count: number;
+  issues: NormalizationIssue[];
+}
+
+export const PrevActionType = {
+  DIRECT: "DIRECT",
+  AI_PARSE: "AI_PARSE",
+};
+
+export type PrevActionType =
+  (typeof PrevActionType)[keyof typeof PrevActionType];
 
 export type MapColToAttrParams = z.infer<
   typeof mapColToAttrSchema.shape.params
@@ -53,4 +78,11 @@ export type ApplyTransformParams = z.infer<
 >;
 export type ApplyTransformBody = z.infer<
   typeof applyTransformSchema.shape.body
+>;
+
+export type ResolveNormalizationIssuesParams = z.infer<
+  typeof resolveNormalizationIssuesSchema.shape.params
+>;
+export type ResolveNormalizationIssuesBody = z.infer<
+  typeof resolveNormalizationIssuesSchema.shape.body
 >;

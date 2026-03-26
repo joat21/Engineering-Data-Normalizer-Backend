@@ -2,9 +2,11 @@ import {
   MappingTarget,
   NormalizedData,
   NormalizedValue,
+  PrevActionType,
+  TransformConfig,
 } from "@engineering-data-normalizer/shared";
 import { applyTransform } from "./transformation/transformers";
-import { NormalizeSingleEntity, TransformConfig } from "./types";
+import { NormalizeSingleEntity } from "./types";
 import { prisma } from "../../prisma";
 import { getRawValue } from "../../helpers/getRawValue";
 import { createEquipment } from "../EquipmentService/service";
@@ -194,7 +196,7 @@ export const resolveNormalizationIssues = async (params: {
     rawValue: string;
     normalized: NormalizedValue;
   }[];
-  sourceType: "DIRECT" | "AI_PARSE";
+  prevActionType: PrevActionType;
   transform?: TransformConfig;
   parsingSessionId?: string;
 }) => {
@@ -203,7 +205,7 @@ export const resolveNormalizationIssues = async (params: {
     colIndex,
     targets,
     resolutions,
-    sourceType,
+    prevActionType,
     transform,
     parsingSessionId,
   } = params;
@@ -223,7 +225,7 @@ export const resolveNormalizationIssues = async (params: {
     skipDuplicates: true,
   });
 
-  if (sourceType === "AI_PARSE" && parsingSessionId) {
+  if (prevActionType === PrevActionType.AI_PARSE && parsingSessionId) {
     return commitAiParsingResults({
       importSessionId,
       parsingSessionId,

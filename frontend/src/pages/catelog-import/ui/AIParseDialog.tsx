@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { Button, Checkbox, Input, Label, Modal } from "@heroui/react";
+import { useTransformationContextStore } from "../model/store";
 import type { TransformationDialogProps } from "../model/types";
 import {
   MappingTargetType,
+  PrevActionType,
   type AiParseColumnResult,
   type CategoryAttribute,
 } from "@engineering-data-normalizer/shared";
@@ -25,6 +27,9 @@ export const AIParseDialog = ({
   onClose,
   selectedRowIds,
 }: AIParseDialogProps) => {
+  const setNormalizationContext = useTransformationContextStore(
+    (s) => s.setNormalizationContext,
+  );
   const [status, setStatus] = useState<Status>("PENDING");
   const [selectedAttrIds, setSelectedAttrIds] = useState<string[]>([]);
   const [parsingSessionId, setParsingSessionId] = useState<string | null>(null);
@@ -130,7 +135,18 @@ export const AIParseDialog = ({
     console.log(payload);
 
     saveAiParseResultsMutation.mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
+        if (data.issues.length > 0) {
+          setNormalizationContext({
+            issues: data.issues,
+            metadata: {
+              sessionId: variables.importSessionId,
+              colIndex: variables.sourceColIndex,
+              targets: variables.targets,
+              prevActionType: PrevActionType.DIRECT,
+            },
+          });
+        }
         alert("Данные сохранены");
         onClose();
       },

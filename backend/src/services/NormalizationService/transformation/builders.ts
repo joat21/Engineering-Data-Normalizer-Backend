@@ -1,11 +1,10 @@
-import { DataType, MappingTarget } from "@engineering-data-normalizer/shared";
-import { JsonValue } from "@prisma/client/runtime/client";
 import {
+  DataType,
   EnrichedTarget,
-  isNormalizedValue,
-  MappingPlan,
-  TransformedRow,
-} from "../types";
+  MappingTarget,
+} from "@engineering-data-normalizer/shared";
+import { JsonValue } from "@prisma/client/runtime/client";
+import { isNormalizedValue, MappingPlan, TransformedRow } from "../types";
 import { prisma } from "../../../prisma";
 import { buildBatchNormalizationContext } from "../normalization/context";
 import { getTargetKey } from "../../../helpers/getTargetKey";
