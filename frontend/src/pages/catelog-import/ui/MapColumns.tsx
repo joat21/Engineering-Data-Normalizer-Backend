@@ -1,9 +1,12 @@
-import { Spinner } from "@heroui/react";
+import { Button, Spinner } from "@heroui/react";
 import { RowsSelectionPanel } from "./RowsSelectionPanel";
 import { TableBody } from "./TableBody";
 import { TableHeader } from "./TableHeader";
 import { TransformModalManager } from "./TransformModalManager";
-import { useStagingTable } from "@/features/import";
+import {
+  useCreateEquipmentFromStagingMutation,
+  useStagingTable,
+} from "@/features/import";
 import { useCategoryAttributes } from "@/entities/category-attribute";
 import { ResolveNormalizationIssuesModal } from "./ResolveNormalizationIssuesModal";
 
@@ -12,6 +15,9 @@ interface MapColumnsProps {
 }
 
 export const MapColumns = ({ sessionId }: MapColumnsProps) => {
+  const createEquipmentFromStagingMutation =
+    useCreateEquipmentFromStagingMutation();
+
   const { data: table, isPending: isTablePending } = useStagingTable({
     sessionId,
   });
@@ -22,17 +28,27 @@ export const MapColumns = ({ sessionId }: MapColumnsProps) => {
   if (isTablePending || isAttributesPending) return <Spinner />;
   if (!table || !attributes) return "Произошла ошибка";
 
+  const handleSave = () => {
+    createEquipmentFromStagingMutation.mutate(
+      { sessionId },
+      { onSuccess: () => alert("Оборудование сохранено") },
+    );
+  };
+
   return (
     <>
-      <table>
-        <TableHeader
-          columns={table.columns}
-          attributes={attributes}
-          isAttributesPending={isAttributesPending}
-          sessionId={sessionId}
-        />
-        <TableBody table={table} />
-      </table>
+      <div className="flex flex-col gap-2 pt-4">
+        <Button onPress={handleSave}>Сохранить оборудование</Button>
+        <table>
+          <TableHeader
+            columns={table.columns}
+            attributes={attributes}
+            isAttributesPending={isAttributesPending}
+            sessionId={sessionId}
+          />
+          <TableBody table={table} />
+        </table>
+      </div>
 
       <RowsSelectionPanel />
 

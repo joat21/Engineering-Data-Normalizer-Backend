@@ -1,9 +1,12 @@
 import { InitCatalogImport } from "./InitCatalogImport";
-import { CatalogImportStep, useImportStore } from "@/features/import";
 import { InitTable } from "./InitTable";
+import { MapColumns } from "./MapColumns";
+import { CatalogImportStep, useImportStore } from "@/features/import";
 
 export const CatalogImportPage = () => {
-  const { step, categoryId } = useImportStore();
+  const step = useImportStore((s) => s.step);
+  const categoryId = useImportStore((s) => s.categoryId);
+  const sessionId = useImportStore((s) => s.sessionId);
 
   const renderContent = () => {
     switch (step) {
@@ -14,7 +17,7 @@ export const CatalogImportPage = () => {
         return <InitTable categoryId={categoryId ?? ""} />;
 
       case CatalogImportStep.MAP_COLUMNS:
-        return "Ты думал тут что то будет?";
+        return <MapColumns sessionId={sessionId ?? ""} />;
     }
   };
 

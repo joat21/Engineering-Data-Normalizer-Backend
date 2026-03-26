@@ -11,6 +11,7 @@ import {
   parseSheet,
 } from "../model/utils";
 import {
+  CatalogImportStep,
   useImportRowsMutation,
   useImportStore,
   useInitImportMutation,
@@ -24,7 +25,9 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
   const initImportMutation = useInitImportMutation();
   const importRowsMutation = useImportRowsMutation();
 
-  const { file, setSessionId } = useImportStore();
+  const file = useImportStore((s) => s.file);
+  const setSessionId = useImportStore((s) => s.setSessionId);
+  const setStep = useImportStore((s) => s.setStep);
   const [data, setData] = useState<any[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -91,8 +94,6 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
     if (!headerRange || !bodyRange || !file) return;
 
     const { headers, body } = extractTableData(data, headerRange, bodyRange);
-    console.log("Headers:", headers);
-    console.log("Body:", body);
 
     try {
       const { sessionId } = await initImportMutation.mutateAsync({
@@ -106,7 +107,7 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
 
       importRowsMutation.mutate(
         { sessionId, rows: body },
-        { onSuccess: () => alert("Данные загружены") },
+        { onSuccess: () => setStep(CatalogImportStep.MAP_COLUMNS) },
       );
     } catch (error) {
       alert("Не удалось инициализировать импорт");

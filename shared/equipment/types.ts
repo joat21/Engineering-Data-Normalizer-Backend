@@ -5,10 +5,15 @@ import {
   numericFilterValueSchema,
   stringFilterValueSchema,
   createEquipmentSchema,
+  createEquipmentFromStagingSchema,
 } from "./schemas";
 
 export type CreateEquipmentBody = z.infer<
   typeof createEquipmentSchema.shape.body
+>;
+
+export type CreateEquipmentFromStagingQuery = z.infer<
+  typeof createEquipmentFromStagingSchema.shape.query
 >;
 
 export type NumericFilterValue = z.infer<typeof numericFilterValueSchema>;

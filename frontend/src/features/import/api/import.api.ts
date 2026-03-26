@@ -4,6 +4,7 @@ import type {
   AiParseColumnResult,
   ApplyTransformBody,
   ApplyTransformParams,
+  CreateEquipmentFromStagingQuery,
   EditAiParseResultsBody,
   EditAiParseResultsParams,
   GetStagingTableParams,
@@ -174,4 +175,17 @@ export const editAiParseResults = (
 export const useEditAiParseResultsMutation = () =>
   useMutation({
     mutationFn: editAiParseResults,
+  });
+
+export const createEquipmentFromStaging = (
+  data: CreateEquipmentFromStagingQuery,
+) =>
+  api
+    .post(`/equipment/staging?sessionId=${data.sessionId}`)
+    .then((r) => r.data);
+
+export const useCreateEquipmentFromStagingMutation = () =>
+  useMutation({
+    mutationKey: ["staging", "equipment"],
+    mutationFn: createEquipmentFromStaging,
   });
