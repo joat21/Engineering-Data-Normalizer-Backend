@@ -1,15 +1,44 @@
-import { flexRender, type Column, type Table } from "@tanstack/react-table";
-import { Button } from "@heroui/react";
-import { cn } from "@heroui/styles";
-import { EyeOff, Pin, PinOff } from "lucide-react";
+import { type Column, type Table } from "@tanstack/react-table";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import type { EquipmentRow } from "@engineering-data-normalizer/shared";
-import { getPinningStyles } from "../model/utils";
+import { DraggableHeader } from "./DraggableHeader";
+import { DraggableCell } from "./DraggableCell";
 
 interface EquipmentTableProps {
   table: Table<EquipmentRow>;
 }
 
 export const EquipmentTable = ({ table }: EquipmentTableProps) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active && over && active.id !== over.id) {
+      const oldOrder = table.getState().columnOrder;
+      const oldIndex = oldOrder.indexOf(active.id as string);
+      const newIndex = oldOrder.indexOf(over.id as string);
+
+      table.setColumnOrder(arrayMove(oldOrder, oldIndex, newIndex));
+    }
+  };
+
   const handleChangeColumnPin = (column: Column<EquipmentRow, unknown>) => {
     const pinningPost = column.getIsPinned();
     column.pin(pinningPost === "left" ? false : "left");
@@ -23,79 +52,49 @@ export const EquipmentTable = ({ table }: EquipmentTableProps) => {
   };
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-default-200">
-      <table className="w-full text-sm text-left table-fixed border-separate border-spacing-0">
-        <thead className="bg-default-100 text-default-700 uppercase text-xs">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const col = header.column;
-
-                return (
-                  <th
-                    key={header.id}
-                    className={cn(
-                      "px-4 py-3 font-semibold bg-gray-400",
-                      col.getIsPinned() &&
-                        "shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                    )}
-                    style={getPinningStyles(col)}
-                  >
-                    <div className="flex flex-col gap-2">
-                      <span>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              col.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </span>
-                      <div className="flex gap-1">
-                        <Button
-                          onPress={() => handleChangeColumnPin(col)}
-                          isIconOnly
-                        >
-                          {col.getIsPinned() ? <PinOff /> : <Pin />}
-                        </Button>
-                        <Button
-                          onPress={() =>
-                            handleChangeColumnVisibility(header.column)
-                          }
-                          isIconOnly
-                        >
-                          {col.getIsVisible() && <EyeOff />}
-                        </Button>
-                      </div>
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody className="divide-y divide-default-100">
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="hover:bg-default-50">
-              {row.getVisibleCells().map((cell) => {
-                const isPinned = cell.column.getIsPinned();
-
-                return (
-                  <td
-                    key={cell.id}
-                    className={cn(
-                      "px-4 py-3 bg-white group-hover:bg-default-50",
-                      isPinned && "shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                    )}
-                    style={getPinningStyles(cell.column)}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      modifiers={[restrictToHorizontalAxis]}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="w-full overflow-x-auto rounded-xl border border-default-200">
+        <table className="w-full text-sm text-left table-fixed border-separate border-spacing-0">
+          <thead className="bg-default-100 text-default-700 uppercase text-xs">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                <SortableContext
+                  items={table.getState().columnOrder}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {headerGroup.headers.map((header) => (
+                    <DraggableHeader
+                      key={header.id}
+                      header={header}
+                      onPin={handleChangeColumnPin}
+                      onHide={handleChangeColumnVisibility}
+                    />
+                  ))}
+                </SortableContext>
+              </tr>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-default-100">
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="hover:bg-default-50">
+                <SortableContext
+                  items={table.getState().columnOrder}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <DraggableCell key={cell.id} cell={cell} />
+                  ))}
+                </SortableContext>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </DndContext>
   );
 };

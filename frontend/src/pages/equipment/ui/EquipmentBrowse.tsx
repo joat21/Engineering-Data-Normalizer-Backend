@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Spinner } from "@heroui/react";
 import {
   getCoreRowModel,
@@ -26,11 +26,19 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
   }, [equipmentData?.headers]);
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([]);
+  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
+    columns.map((c) => c.id!),
+  );
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
     left: [],
     right: [],
   });
+
+  useEffect(() => {
+    if (columns.length > 0 && columnOrder.length === 0) {
+      setColumnOrder(columns.map((c) => c.id!));
+    }
+  }, [columns]);
 
   const table = useReactTable<EquipmentRow>({
     columns,
