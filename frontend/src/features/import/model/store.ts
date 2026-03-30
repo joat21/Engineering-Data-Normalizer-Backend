@@ -6,6 +6,7 @@ interface ImportState {
   step: SingleImportStep | CatalogImportStep;
   sourceType: SourceType | null;
   categoryId: string | null;
+  categoryName?: string;
   file: File | null;
   sessionId: string | null;
 
@@ -15,6 +16,7 @@ interface ImportState {
     sourceType: SourceType;
   }) => void;
   setCategoryId: (categoryId: string) => void;
+  setCategoryName: (name?: string) => void;
   setSessionId: (id: string) => void;
   setStep: (step: SingleImportStep | CatalogImportStep) => void;
   reset: () => void;
@@ -30,6 +32,7 @@ export const useImportStore = create<ImportState>((set) => ({
   setInitialData: (data) =>
     set({ ...data, step: SingleImportStep.FILL_ATTRIBUTES }),
   setCategoryId: (id) => set({ categoryId: id }),
+  setCategoryName: (name) => set({ categoryName: name }),
   setSessionId: (id) => set({ sessionId: id }),
   setStep: (step) => set({ step }),
   reset: () =>

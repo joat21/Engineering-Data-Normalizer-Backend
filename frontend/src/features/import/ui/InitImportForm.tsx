@@ -6,7 +6,11 @@ import { AppSelect, FileDropzone } from "@/shared/ui";
 import { ACCEPTED_FORMATS } from "../model/config";
 
 interface InitImportFormProps {
-  onSubmit: (data: { file: File; categoryId: string }) => void;
+  onSubmit: (data: {
+    file: File;
+    categoryId: string;
+    categoryName?: string;
+  }) => void;
   isLoading?: boolean;
   sourceType: SourceType;
 }
@@ -23,12 +27,15 @@ export const InitImportForm = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const categoryId = String(formData.get("category"));
 
+    if (!categoryId) return;
     if (!file) return alert("Выберите файл");
 
-    onSubmit({ file, categoryId });
+    onSubmit({
+      file,
+      categoryId,
+      categoryName: categories?.find((c) => c.id === categoryId)?.name,
+    });
   };
 
   return (

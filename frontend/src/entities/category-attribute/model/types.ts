@@ -6,6 +6,7 @@ import type {
 export interface BaseAttributeFieldProps {
   attributeKey: string;
   label: string;
+  variant?: "primary" | "secondary"; // тут в идеале взять тип из HeroUI
 }
 
 export interface StringFieldProps extends BaseAttributeFieldProps {

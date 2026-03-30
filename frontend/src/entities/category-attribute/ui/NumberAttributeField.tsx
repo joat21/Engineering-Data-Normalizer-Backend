@@ -8,20 +8,36 @@ export const NumberAttributeField = ({
   attributeKey,
   label,
   unit,
+  variant,
 }: NumberFieldProps) => {
   const [isRange, setIsRange] = useState(false);
 
   return (
-    <div key={attributeKey} className="flex flex-col gap-1">
-      <Label>
-        {label} {unit}
-      </Label>
-      <div className="flex gap-1">
-        {isRange ? (
-          <RangeField attributeKey={attributeKey} label={label} />
-        ) : (
-          <ExactField attributeKey={attributeKey} label={label} />
-        )}
+    <div className="flex flex-col gap-2 group">
+      <div className="flex justify-between items-end px-1">
+        <Label className="text-base">
+          {label}{" "}
+          {unit && <span className="text-foreground/80 ml-1">({unit})</span>}
+        </Label>
+      </div>
+
+      <div className="flex gap-2 items-start">
+        <div className="flex-1">
+          {isRange ? (
+            <RangeField
+              variant={variant}
+              attributeKey={attributeKey}
+              label={label}
+            />
+          ) : (
+            <ExactField
+              variant={variant}
+              attributeKey={attributeKey}
+              label={label}
+            />
+          )}
+        </div>
+
         <Tooltip delay={0} closeDelay={0}>
           <Button isIconOnly onPress={() => setIsRange(!isRange)}>
             {isRange ? <Variable /> : <ArrowLeftRight />}
@@ -35,28 +51,39 @@ export const NumberAttributeField = ({
   );
 };
 
-const ExactField = ({ attributeKey, label }: BaseAttributeFieldProps) => {
+const ExactField = ({
+  attributeKey,
+  label,
+  variant,
+}: BaseAttributeFieldProps) => {
   return (
     <AppNumberField
       aria-label={label}
       name={`${attributeKey}_valueMin`}
       placeholder={label}
+      variant={variant}
     />
   );
 };
 
-const RangeField = ({ attributeKey, label }: BaseAttributeFieldProps) => {
+const RangeField = ({
+  attributeKey,
+  label,
+  variant,
+}: BaseAttributeFieldProps) => {
   return (
     <div className="flex gap-1">
       <AppNumberField
         aria-label={label}
         name={`${attributeKey}_valueMin`}
         placeholder="Минимум"
+        variant={variant}
       />
       <AppNumberField
         aria-label={label}
         name={`${attributeKey}_valueMax`}
         placeholder="Максимум"
+        variant={variant}
       />
     </div>
   );

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { SourceType } from "@engineering-data-normalizer/shared";
 import { SingleImportCreate } from "./SingleImportCreate";
 import {
@@ -12,14 +13,24 @@ export const SingleImportPage = () => {
   const step = useImportStore((s) => s.step);
   const setStep = useImportStore((s) => s.setStep);
   const categoryId = useImportStore((s) => s.categoryId);
+  const setCategoryName = useImportStore((s) => s.setCategoryName);
   const setInitialData = useImportStore((s) => s.setInitialData);
   const setSessionId = useImportStore((s) => s.setSessionId);
+  const resetImport = useImportStore((s) => s.reset);
 
   const initImportMutation = useInitImportMutation();
 
   const { data: categoryAttributes } = useCategoryAttributes(categoryId ?? "");
 
-  const handleInitImport = (data: { file: File; categoryId: string }) => {
+  useEffect(() => {
+    return () => resetImport();
+  }, []);
+
+  const handleInitImport = (data: {
+    file: File;
+    categoryId: string;
+    categoryName?: string;
+  }) => {
     initImportMutation.mutate(
       { ...data, sourceType: SourceType.SINGLE_ITEM },
       {
@@ -27,13 +38,14 @@ export const SingleImportPage = () => {
           setInitialData({ ...data, sourceType: SourceType.SINGLE_ITEM });
           setSessionId(res.sessionId);
           setStep(SingleImportStep.FILL_ATTRIBUTES);
+          setCategoryName(data.categoryName);
         },
       },
     );
   };
 
   return (
-    <div className="flex justify-center items-center w-full h-full">
+    <div className="flex justify-center w-full">
       {step === SingleImportStep.TYPE_SELECTION && (
         <InitImportForm
           onSubmit={handleInitImport}

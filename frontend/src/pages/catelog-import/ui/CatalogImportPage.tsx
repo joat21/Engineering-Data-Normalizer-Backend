@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { InitCatalogImport } from "./InitCatalogImport";
 import { InitTable } from "./InitTable";
 import { MapColumns } from "./MapColumns";
@@ -7,6 +8,11 @@ export const CatalogImportPage = () => {
   const step = useImportStore((s) => s.step);
   const categoryId = useImportStore((s) => s.categoryId);
   const sessionId = useImportStore((s) => s.sessionId);
+  const resetImport = useImportStore((s) => s.reset);
+
+  useEffect(() => {
+    return () => resetImport();
+  }, []);
 
   const renderContent = () => {
     switch (step) {
@@ -26,9 +32,5 @@ export const CatalogImportPage = () => {
     }
   };
 
-  return (
-    <div className="flex justify-center items-center w-full h-full">
-      {renderContent()}
-    </div>
-  );
+  return <div className="flex justify-center w-full">{renderContent()}</div>;
 };

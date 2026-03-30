@@ -83,7 +83,6 @@ export const ResolveNormalizationIssuesModal = () => {
                     <AttributeField
                       key={getTargetKey(issue.target)}
                       attributeKey={`${getTargetKey(issue.target)}|${val}`}
-                      // label={val}
                       label={`${issue.target.label}: ${val}`}
                       //
                       unit=""

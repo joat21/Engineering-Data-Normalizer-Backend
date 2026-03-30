@@ -7,31 +7,13 @@ import type { AttributeFieldProps } from "../model/types";
 export const AttributeField = (props: AttributeFieldProps) => {
   switch (props.dataType) {
     case DataType.STRING:
-      return (
-        <StringAttributeField
-          attributeKey={props.attributeKey}
-          label={props.label}
-          options={props.options}
-        />
-      );
+      return <StringAttributeField {...props} />;
 
     case DataType.NUMBER:
-      return (
-        <NumberAttributeField
-          attributeKey={props.attributeKey}
-          label={props.label}
-          unit={props.unit}
-          options={props.options}
-        />
-      );
+      return <NumberAttributeField {...props} />;
 
     case DataType.BOOLEAN:
-      return (
-        <BooleanAttributeField
-          attributeKey={props.attributeKey}
-          label={props.label}
-        />
-      );
+      return <BooleanAttributeField {...props} />;
 
     default:
       const _exhaustive: never = props;
