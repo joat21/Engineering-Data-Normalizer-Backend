@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import type { Key } from "@heroui/react";
+import { Label, type Key } from "@heroui/react";
 import type {
   CategoryAttribute,
   StagingColumn,
@@ -35,18 +35,21 @@ export const HeaderColumn = memo(
     );
 
     return (
-      <div className="flex flex-col gap-1">
-        <span>{col.label}</span>
-        <AppSelect
-          items={attributes}
-          getItemKey={(attr) => attr.id}
-          getItemLabel={(attr) => attr.label}
-          aria-label="Атрибуты"
-          isPending={isAttributesPending}
-          placeholder="Атрибут"
-          onChange={(value) => onSelectAttribute(col, value)}
-        />
-        <TransformationDropdown onAction={handleSelectTransformation} />
+      <div className="flex flex-col gap-2 p-3 min-w-55">
+        <Label className="text-base font-bold truncate">{col.label}</Label>
+        <div className="flex items-center gap-1">
+          <AppSelect
+            className="flex-1"
+            items={attributes}
+            getItemKey={(attr) => attr.id}
+            getItemLabel={(attr) => attr.label}
+            aria-label="Атрибуты"
+            isPending={isAttributesPending}
+            placeholder="Атрибут"
+            onChange={(value) => onSelectAttribute(col, value)}
+          />
+          <TransformationDropdown onAction={handleSelectTransformation} />
+        </div>
       </div>
     );
   },

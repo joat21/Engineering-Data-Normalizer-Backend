@@ -15,9 +15,13 @@ export const DataRow = memo(
     const toggleRow = useSelectionStore((s) => s.toggleRow);
 
     return (
-      <tr key={row.id} id={row.id}>
+      <tr
+        key={row.id}
+        id={row.id}
+        className="bg-white hover:bg-gray-100 transition-colors group"
+      >
         {isSelecting && (
-          <td className="pr-0">
+          <td className="p-3 border-b border-r text-center">
             <Checkbox
               aria-label={`Select`}
               slot="selection"
@@ -32,7 +36,12 @@ export const DataRow = memo(
           </td>
         )}
         {columnKeys.map((key) => (
-          <td key={key}>{row.values[key]}</td>
+          <td
+            key={key}
+            className="p-3 border-b border-r max-w-75 text-center truncate"
+          >
+            {row.values[key] || "—"}
+          </td>
         ))}
       </tr>
     );

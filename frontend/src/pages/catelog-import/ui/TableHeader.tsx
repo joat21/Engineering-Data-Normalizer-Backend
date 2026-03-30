@@ -85,10 +85,10 @@ export const TableHeader = ({
   );
 
   return (
-    <thead>
-      <tr>
+    <thead className="sticky top-0 z-20 shadow-sm">
+      <tr className="bg-gray-300">
         {isSelecting && (
-          <th className="pr-0">
+          <th className="p-3">
             <Checkbox aria-label="Выбрать все" slot="selection">
               <Checkbox.Control>
                 <Checkbox.Indicator />
