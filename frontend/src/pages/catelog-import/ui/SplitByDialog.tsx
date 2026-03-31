@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Input, Modal, type Key } from "@heroui/react";
+import { Button, Input, Label, Modal, type Key } from "@heroui/react";
+import { Scissors } from "lucide-react";
 import {
   MappingTargetType,
   PrevActionType,
@@ -7,10 +8,13 @@ import {
   TransformType,
   type MappingTarget,
 } from "@engineering-data-normalizer/shared";
+import { Mapping } from "./Mapping";
+import { SourceValues } from "./SourceValues";
+import { ModalBody } from "./ModalBody";
+import { ModalHeader } from "./ModalHeader";
 import { separators } from "../model/constants";
 import { useTransformationContextStore } from "../model/store";
 import type { TransformationDialogProps } from "../model/types";
-
 import { useApplyTransformMutation } from "@/features/import";
 import { AppSelect } from "@/shared/ui";
 
@@ -25,7 +29,7 @@ export const SplitByDialog = ({
     (s) => s.setNormalizationContext,
   );
 
-  const sourceValue = rows[0]?.values[column.id] || "";
+  const sourceValue = rows[0]?.values[column.id] || "—";
 
   const [selectedSeparator, setSelectedSeparator] = useState<string | null>(
     null,
@@ -87,54 +91,54 @@ export const SplitByDialog = ({
   };
 
   return (
-    <Modal.Dialog aria-label="Разбить по символу" className="sm:max-w-90">
-      <Modal.CloseTrigger />
-      <Modal.Header>
+    <Modal.Dialog aria-label="Разбиение по символу">
+      <Modal.CloseTrigger onPress={onClose} />
+      <Modal.Header className="mb-2">
         <div>
-          <h2 className="text-xl font-semibold">Разбить по символу</h2>
-          <p className="text-sm text-gray-600 mt-1">Колонка: {column.label}</p>
+          <h2 className="mb-1 text-2xl font-semibold">Разбиение по символу</h2>
+          <p className="text-gray-600">Колонка: {column.label}</p>
         </div>
       </Modal.Header>
-      <Modal.Body>
+      <ModalHeader
+        title="Извлечение чисел"
+        columnName={column.label}
+        icon={Scissors}
+      />
+      <ModalBody>
+        <SourceValues
+          title="Пример исходного значения"
+          values={[sourceValue]}
+        />
+
         <div className="flex flex-col gap-1">
-          <span>Исходное значение:</span>
-          <Input
-            value={sourceValue ?? ""}
-            variant="secondary"
-            aria-label="Исходное значение"
-            disabled
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span>Выберите разделитель:</span>
+          <Label htmlFor="select-separator" className="text-lg font-medium">
+            Выберите разделитель:
+          </Label>
           <AppSelect
+            id="select-separator"
             items={separators}
             getItemKey={(s) => s.key}
             getItemLabel={(s) => s.label}
-            aria-label="Разделитель"
+            variant="secondary"
             onChange={handleSelectSeparator}
           />
+          <Label htmlFor="select-input" className="text-lg font-medium">
+            Или введите свой символ:
+          </Label>
+          <Input
+            id="select-input"
+            placeholder="Введите символ..."
+            variant="secondary"
+            onChange={(e) => handleSelectSeparator(e.target.value)}
+          />
         </div>
-        {splitted && (
-          <div className="flex flex-col gap-1">
-            <span>Результат разбиения:</span>
-            {splitted.map((part, i) => (
-              <div key={i} className="flex gap-1">
-                <span>{part}</span>
-                <AppSelect
-                  items={attributes}
-                  getItemKey={(attr) => attr.id}
-                  getItemLabel={(attr) => attr.label}
-                  variant="secondary"
-                  className="w-full"
-                  aria-label={`Атрибут для части ${part}`}
-                  onChange={(attrId) => handleSelectAttribute(attrId, i)}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </Modal.Body>
+
+        <Mapping
+          values={splitted ?? []}
+          attributes={attributes}
+          onSelectAttribute={handleSelectAttribute}
+        />
+      </ModalBody>
       <Modal.Footer>
         <Button onPress={onClose} variant="secondary">
           Отмена

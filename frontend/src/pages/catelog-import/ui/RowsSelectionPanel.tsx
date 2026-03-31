@@ -1,4 +1,4 @@
-import { Button, Card } from "@heroui/react";
+import { Button, Card, cn } from "@heroui/react";
 import {
   useSelectionStore,
   useTransformationContextStore,
@@ -23,12 +23,32 @@ export const RowsSelectionPanel = () => {
   };
 
   return (
-    <Card className="fixed flex-row bottom-10 left-1/2 -translate-x-1/2 shadow-xl p-4 gap-4 items-center border">
-      <span>Выберите строки для ИИ: {count} / 5</span>
-      <Button onPress={handleCancel}>Отмена</Button>
-      <Button variant="primary" isDisabled={!count} onPress={handleContinue}>
-        Продолжить
-      </Button>
+    <Card
+      className={cn(
+        "fixed bottom-12 left-1/2 flex-row gap-6 items-center px-6 py-3 max-w-[90vh] w-fit",
+        "border-none backdrop-blur-xl ring-1 ring-accent/10 -translate-x-1/2 shadow-2xl",
+      )}
+    >
+      <div className="flex flex-col">
+        <span className="text-lg font-semibold">Тестовая выборка</span>
+        <span>
+          Выберите от 2 до 5 строк для калибровки ИИ:{" "}
+          <b className="whitespace-nowrap">{count} / 5</b>
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button onPress={handleCancel} className="font-medium">
+          Отмена
+        </Button>
+        <Button
+          isDisabled={count < 2}
+          onPress={handleContinue}
+          className="font-bold px-6"
+        >
+          Продолжить
+        </Button>
+      </div>
     </Card>
   );
 };

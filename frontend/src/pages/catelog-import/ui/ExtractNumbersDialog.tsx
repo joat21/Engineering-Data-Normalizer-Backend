@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Input, Modal, type Key } from "@heroui/react";
+import { Button, Modal, type Key } from "@heroui/react";
+import { Hash } from "lucide-react";
 import {
   MappingTargetType,
   parseNumbers,
@@ -7,10 +8,13 @@ import {
   TransformType,
   type MappingTarget,
 } from "@engineering-data-normalizer/shared";
+import { Mapping } from "./Mapping";
+import { SourceValues } from "./SourceValues";
+import { ModalHeader } from "./ModalHeader";
+import { ModalBody } from "./ModalBody";
 import { useTransformationContextStore } from "../model/store";
 import type { TransformationDialogProps } from "../model/types";
 import { useApplyTransformMutation } from "@/features/import";
-import { AppSelect } from "@/shared/ui";
 
 export const ExtractNumbersDialog = ({
   column,
@@ -23,7 +27,7 @@ export const ExtractNumbersDialog = ({
     (s) => s.setNormalizationContext,
   );
 
-  const sourceValue = rows[0]?.values[column.id] || "";
+  const sourceValue = rows[0]?.values[column.id] || "—";
   const extractedNumbers = parseNumbers(sourceValue);
 
   const [targets, setTargets] = useState<(MappingTarget | null)[]>(
@@ -72,42 +76,25 @@ export const ExtractNumbersDialog = ({
   };
 
   return (
-    <Modal.Dialog aria-label="Извлечь числа" className="sm:max-w-90">
-      <Modal.CloseTrigger />
-      <Modal.Header>
-        <div>
-          <h2 className="text-xl font-semibold">Извлечь числа</h2>
-          <p className="text-sm text-gray-600 mt-1">Колонка: {column.label}</p>
-        </div>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="flex flex-col gap-1">
-          <span>Исходное значение:</span>
-          <Input
-            value={sourceValue ?? ""}
-            variant="secondary"
-            aria-label="Исходное значение"
-            disabled
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span>Извлеченные числа:</span>
-          {extractedNumbers.map((num, i) => (
-            <div key={i} className="flex gap-1">
-              <span>{num}</span>
-              <AppSelect
-                items={attributes}
-                getItemKey={(attr) => attr.id}
-                getItemLabel={(attr) => attr.label}
-                variant="secondary"
-                className="w-full"
-                aria-label={`Атрибут для числа ${num}`}
-                onChange={(attrId) => handleSelectAttribute(attrId, i)}
-              />
-            </div>
-          ))}
-        </div>
-      </Modal.Body>
+    <Modal.Dialog aria-label="Извлечение чисел">
+      <Modal.CloseTrigger onPress={onClose} />
+      <ModalHeader
+        title="Извлечение чисел"
+        columnName={column.label}
+        icon={Hash}
+      />
+      <ModalBody>
+        <SourceValues
+          title="Пример исходного значения"
+          values={[sourceValue]}
+        />
+
+        <Mapping
+          values={extractedNumbers}
+          attributes={attributes}
+          onSelectAttribute={handleSelectAttribute}
+        />
+      </ModalBody>
       <Modal.Footer>
         <Button onPress={onClose} variant="secondary">
           Отмена

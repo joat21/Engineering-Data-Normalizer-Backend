@@ -1,18 +1,31 @@
 import { useMemo, useState } from "react";
-import { Button, Checkbox, cn, Input, Label, Modal } from "@heroui/react";
-import { useTransformationContextStore } from "../model/store";
-import type { TransformationDialogProps } from "../model/types";
+import { Button, Checkbox, Chip, cn, Input, Modal } from "@heroui/react";
+import {
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Info,
+  Play,
+  Save,
+  WandSparkles,
+  Zap,
+} from "lucide-react";
 import {
   MappingTargetType,
   PrevActionType,
   type AiParseColumnResult,
   type CategoryAttribute,
 } from "@engineering-data-normalizer/shared";
+import { useTransformationContextStore } from "../model/store";
+import type { TransformationDialogProps } from "../model/types";
 import {
   useApplyAiParseMutation,
   useEditAiParseResultsMutation,
   useSaveAiParseResultsMutation,
 } from "@/features/import";
+import { ModalHeader } from "./ModalHeader";
+import { ModalBody } from "./ModalBody";
+import { ModalLoader } from "./ModalLoader";
 
 type Status = "PENDING" | "TESTED" | "PARSED_ALL";
 
@@ -80,8 +93,6 @@ export const AIParseDialog = ({
       targets,
     };
 
-    console.log(payload);
-
     applyAiParseMutation.mutate(payload, {
       onSuccess: (data) => {
         setStatus("TESTED");
@@ -116,8 +127,6 @@ export const AIParseDialog = ({
 
   const handleApply = () => {
     if (!parsingSessionId) return;
-
-    console.log(parsingSessionId);
 
     const targets = attributes
       .filter((attr) => selectedAttrIds.includes(attr.id))
@@ -174,8 +183,6 @@ export const AIParseDialog = ({
       };
     });
 
-    console.log(editedValues);
-
     editAiParseResultsMutation.mutate(
       {
         sessionId: parsingSessionId,
@@ -223,110 +230,226 @@ export const AIParseDialog = ({
   };
 
   return (
-    <Modal.Dialog aria-label="ИИ-парсинг">
-      <Modal.CloseTrigger />
-      <Modal.Header>
-        <div>
-          <h2 className="text-xl font-semibold">ИИ-парсинг</h2>
-          <p className="text-sm text-gray-600 mt-1">Колонка: {column.label}</p>
+    <Modal.Dialog
+      aria-label="ИИ-анализ"
+      className="max-w-[90vw] w-300 max-h-[90vh] flex flex-col"
+    >
+      <ModalLoader
+        isLoading={
+          applyAiParseMutation.isPending ||
+          editAiParseResultsMutation.isPending ||
+          saveAiParseResultsMutation.isPending
+        }
+      />
+      <Modal.CloseTrigger onPress={onClose} />
+      <ModalHeader
+        title="Интеллектуальный анализ (ИИ)"
+        columnName={column.label}
+        icon={WandSparkles}
+      />
+
+      <ModalBody className="flex-1 overflow-y-auto gap-8">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex gap-4">
+          <div className="bg-blue-500 text-white p-2 rounded-lg h-fit">
+            <Info size={20} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="font-bold text-blue-900">Как это работает?</span>
+            <ol className="text-sm text-blue-800/80 list-decimal ml-4 flex flex-col gap-1">
+              <li>
+                Выберите <b>характеристики</b>, которые ИИ должен найти в
+                тексте.
+              </li>
+              <li>
+                Запустите <b>тестовый анализ</b> на выбранных примерах (
+                {selectedValues.length} шт).
+              </li>
+              <li>
+                Проверьте результат и при необходимости <b>внесите правки</b>{" "}
+                прямо в таблицу.
+              </li>
+              <li>
+                Если всё ок — примените ко <b>всем строкам</b> в файле.
+              </li>
+            </ol>
+          </div>
         </div>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="flex flex-col gap-1">
-          <span>Выбранные значения:</span>
-          {selectedValues.map((val, i) => (
-            <Input
-              key={i}
-              value={val}
-              variant="secondary"
-              aria-label={val}
-              disabled
-            />
-          ))}
-        </div>
-        <div className="flex flex-col gap-1">
-          <span>Выберите атрибуты для извлечения:</span>
-          <div className="grid grid-cols-2">
-            {attributes.map((attr) => (
-              <Checkbox
-                key={attr.id}
-                name={attr.key}
-                onChange={(isSelected) =>
-                  handleSelectAttribute(isSelected, attr)
-                }
-                variant="secondary"
+
+        <div className="flex flex-col gap-3">
+          <span className="text-base font-semibold uppercase">
+            Примеры данных для теста
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {selectedValues.map((val, i) => (
+              <div
+                key={i}
+                className="px-3 py-1 bg-default-100 rounded-full text-sm font-mono text-default-600 border border-default-200"
               >
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-                <Checkbox.Content>
-                  <Label>{attr.label}</Label>
-                </Checkbox.Content>
-              </Checkbox>
+                {val}
+              </div>
             ))}
           </div>
         </div>
+
+        <div className="flex flex-col gap-4">
+          <span className="font-semibold">
+            Выберите характеристики для извлечения
+          </span>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {attributes.map((attr) => (
+              <label
+                key={attr.id}
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-xl border transition-colors cursor-pointer bg-white",
+                  "hover:bg-accent/5 hover:border-accent/50",
+                )}
+              >
+                <Checkbox
+                  key={attr.id}
+                  name={attr.key}
+                  onChange={(isSelected) =>
+                    handleSelectAttribute(isSelected, attr)
+                  }
+                  variant="secondary"
+                >
+                  <Checkbox.Control>
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+                  <Checkbox.Content>
+                    <span className="text-sm font-medium select-none">
+                      {attr.label}
+                    </span>
+                  </Checkbox.Content>
+                </Checkbox>
+              </label>
+            ))}
+          </div>
+        </div>
+
         {parsingResult && (
-          <div className="flex flex-col gap-1">
-            <span>Результаты анализа:</span>
-            <table>
-              <thead>
-                <tr>
-                  {parsingResult.headers.map((h) => (
-                    <th key={h.key}>{h.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {parsingResult.rows.map((row) => (
-                  <tr key={row.id}>
-                    <td>{row.sourceString}</td>
-                    {row.values.map((v, i) => {
-                      // i + 1 потому что в headers лежит еще и sourceString
-                      const header = parsingResult.headers[i + 1];
-                      const targetKey = header.key;
-                      const cellKey = `${row.id}:${targetKey}`;
-                      const displayValue = edits[cellKey] ?? v;
-
-                      const isEdited = !!edits[`${row.id}:${targetKey}`];
-
-                      return (
-                        <td key={i}>
-                          <Input
-                            value={displayValue}
-                            onChange={(e) =>
-                              handleCellEdit(row.id, targetKey, e.target.value)
-                            }
-                            className={cn(
-                              isEdited && "bg-blue-50 border-blue-200",
-                            )}
-                          />
-                        </td>
-                      );
-                    })}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2 font-bold text-success">
+                <CheckCircle2 />{" "}
+                {status === "TESTED" && "Результаты тестового анализа"}
+                {status === "PARSED_ALL" && "Результаты анализа всех строк"}
+              </span>
+              {Object.keys(edits).length > 0 && (
+                <Chip
+                  color="warning"
+                  className="flex gap-1 p-1 text-base bg-transparent"
+                >
+                  <AlertCircle />
+                  Есть несохраненные правки
+                </Chip>
+              )}
+            </div>
+            <div className="border rounded-2xl shadow-sm bg-white overflow-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    {parsingResult.headers.map((h) => (
+                      <th
+                        key={h.key}
+                        className="p-3 text-left text-xs font-bold uppercase"
+                      >
+                        {h.label}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {parsingResult.rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="border-b last:border-0 hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-3 text-base font-mono text-default-500 bg-default-50/50 w-[30%]">
+                        {row.sourceString}
+                      </td>
+                      {row.values.map((v, i) => {
+                        const targetKey = parsingResult.headers[i + 1].key;
+                        const cellKey = `${row.id}:${targetKey}`;
+                        let displayValue = v === "null" ? "" : v;
+
+                        if (edits[cellKey]) {
+                          displayValue = edits[cellKey];
+                        }
+
+                        const isEdited = !!edits[cellKey];
+
+                        return (
+                          <td key={i} className="p-2">
+                            <Input
+                              value={displayValue}
+                              onChange={(e) =>
+                                handleCellEdit(
+                                  row.id,
+                                  targetKey,
+                                  e.target.value,
+                                )
+                              }
+                              variant="secondary"
+                              className={cn(
+                                "min-w-30 transition-all",
+                                isEdited &&
+                                  "ring-2 ring-blue-500 border-blue-500",
+                              )}
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onPress={onClose} variant="secondary">
-          Отмена
-        </Button>
-        {status === "PENDING" && (
-          <Button onPress={handleTestParse}>Тест</Button>
-        )}
-        {status === "TESTED" && (
-          <Button onPress={handleParseAll}>Применить ко всей колонке</Button>
-        )}
-        {status === "PARSED_ALL" && (
-          <Button onPress={handleApply}>Сохранить</Button>
-        )}
-        {Object.keys(edits).length > 0 && (
-          <Button onPress={handleSaveEdits}>Сохранить правки</Button>
-        )}
+      </ModalBody>
+
+      <Modal.Footer className="p-4 border-t">
+        <div className="flex justify-between w-full items-center">
+          <Button variant="outline" onPress={onClose}>
+            Отмена
+          </Button>
+
+          <div className="flex items-center gap-3">
+            {Object.keys(edits).length > 0 && (
+              <Button variant="secondary" onPress={handleSaveEdits}>
+                <Save />
+                Сохранить правки
+              </Button>
+            )}
+
+            {status === "PENDING" && (
+              <Button className="font-bold px-8" onPress={handleTestParse}>
+                <Play fill="currentColor" />
+                Запустить тест
+              </Button>
+            )}
+
+            {status === "TESTED" && (
+              <Button
+                className="font-bold px-8 bg-purple-500"
+                onPress={handleParseAll}
+              >
+                <Zap fill="currentColor" />
+                Обработать всю колонку
+              </Button>
+            )}
+
+            {status === "PARSED_ALL" && (
+              <Button
+                className="font-bold px-8 bg-success"
+                onPress={handleApply}
+              >
+                <Check strokeWidth={3} />
+                Подтвердить и применить
+              </Button>
+            )}
+          </div>
+        </div>
       </Modal.Footer>
     </Modal.Dialog>
   );
