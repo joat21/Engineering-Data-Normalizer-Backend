@@ -215,6 +215,8 @@ export const updateCategoryAttribute = async (
   });
 
   await handleUpdateCategoryFilter(attribute.categoryId, attribute, {
+    // TODO: в идеале сперва получать сам атрибут,
+    // чтобы сравнить лейблы
     labelChanged: !!data.label,
     isFilterable: attribute.isFilterable,
   });

@@ -17,7 +17,9 @@ export const CreateCategoryAttributeModal = ({
 }: CreateCategoryAttributeModalProps) => {
   const createCategoryAttributeMutation = useCreateCategoryAttributeMutation();
 
-  const handleCreateCategory = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateCategoryAttribute = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
@@ -28,8 +30,6 @@ export const CreateCategoryAttributeModal = ({
       unit: String(formData.get("unit") ?? ""),
       isFilterable: formData.get("isFilterable") === "on",
     };
-
-    console.log(payload);
 
     await createCategoryAttributeMutation.mutateAsync(payload);
     onClose();
@@ -48,7 +48,7 @@ export const CreateCategoryAttributeModal = ({
           <Modal.Body>
             <Form
               id="create-category-attribute"
-              onSubmit={handleCreateCategory}
+              onSubmit={handleCreateCategoryAttribute}
               className="flex flex-col gap-4"
             >
               <Label htmlFor="label" className="flex flex-col gap-1 text-lg">

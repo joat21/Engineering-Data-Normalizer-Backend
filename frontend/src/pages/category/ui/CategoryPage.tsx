@@ -1,15 +1,59 @@
+import { useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { Button, Spinner, useOverlayState } from "@heroui/react";
+import { Button, Spinner, Table, useOverlayState } from "@heroui/react";
 import { useCategory } from "@/entities/category";
 import { CreateCategoryAttributeModal } from "@/features/create-category-attibute";
+import {
+  MappingTargetType,
+  type CategoryAttribute,
+} from "@engineering-data-normalizer/shared";
+import { TableRow } from "./TableRow";
+import { HEADERS } from "../model/config";
+import { EditCategoryAttributeModal } from "@/features/edit-category-attribute";
 
 export const CategoryPage = () => {
   const { id = "" } = useParams();
   const createCategoryAttributeModal = useOverlayState();
+  const editCategoryAttributeModal = useOverlayState();
+
+  const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(
+    null,
+  );
 
   const { data: category, isPending } = useCategory({ id });
 
+  const selectedAttr = category?.attributes.find(
+    (a) => a.id === selectedAttributeId,
+  );
+
+  const [systemFields, technicalFields] = useMemo(() => {
+    const systemFields =
+      category?.attributes.filter((a) => a.type === MappingTargetType.SYSTEM) ||
+      [];
+    const technicalFields =
+      category?.attributes.filter(
+        (a) => a.type === MappingTargetType.ATTRIBUTE,
+      ) || [];
+
+    return [systemFields, technicalFields];
+  }, [category?.attributes]);
+
   if (isPending) return <Spinner />;
+
+  const handleOpenEditModal = (attrId: string) => {
+    setSelectedAttributeId(attrId);
+    editCategoryAttributeModal.open();
+  };
+
+  const renderRow = (attribute: CategoryAttribute) => {
+    return (
+      <TableRow
+        key={attribute.id}
+        attribute={attribute}
+        onClickEdit={handleOpenEditModal}
+      />
+    );
+  };
 
   return (
     <>
@@ -29,19 +73,32 @@ export const CategoryPage = () => {
           </Button>
         </div>
 
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {category?.attributes.map((attr) => (
-            <li key={attr.id} className="w-full list-none">
-              {attr.label}
-            </li>
-          ))}
-        </ul>
+        <Table>
+          <Table.Content>
+            <Table.Header>
+              {HEADERS.map((header, i) => (
+                <Table.Column isRowHeader key={i} className="text-base">
+                  {header}
+                </Table.Column>
+              ))}
+            </Table.Header>
+            <Table.Body>
+              {[...systemFields, ...technicalFields].map(renderRow)}
+            </Table.Body>
+          </Table.Content>
+        </Table>
       </div>
 
       <CreateCategoryAttributeModal
         categoryId={id}
         isOpen={createCategoryAttributeModal.isOpen}
         onClose={createCategoryAttributeModal.close}
+      />
+
+      <EditCategoryAttributeModal
+        attribute={selectedAttr}
+        isOpen={editCategoryAttributeModal.isOpen}
+        onClose={editCategoryAttributeModal.close}
       />
     </>
   );
