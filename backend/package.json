@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1000.0",
+    "@engineering-data-normalizer/shared": "*",
     "@google/genai": "^1.45.0",
     "@prisma/client": "^7.4.2",
     "bcrypt": "^6.0.0",
@@ -21,10 +22,10 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.0",
     "nodemon": "^3.1.14",
+    "p-map": "^7.0.4",
     "slugify": "^1.6.8",
     "uuid": "^13.0.0",
-    "zod": "^4.3.6",
-    "@engineering-data-normalizer/shared": "*"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@prisma/adapter-pg": "^7.4.2",

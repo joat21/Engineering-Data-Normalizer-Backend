@@ -1,9 +1,17 @@
 import type z from "zod";
 import type {
+  createCategoryAttributeSchema,
+  createCategorySchema,
   getCategoryAttributesSchema,
   getCategoryFiltersSchema,
+  getCategoryWithAttributesSchema,
+  updateCategoryAttributeSchema,
 } from "./schemas";
-import type { MappingTargetType, NormalizedValue } from "../normalization";
+import type {
+  MappingTargetType,
+  NormalizationOption,
+  NormalizedValue,
+} from "../normalization";
 
 export interface Category {
   id: string;
@@ -34,7 +42,9 @@ export interface CategoryAttribute {
   unit: string | null;
   dataType: DataType;
   isFilterable: boolean;
-  options: AttributeOption[];
+  // здесь options нужны для создания оборудования вручную,
+  // чтобы предложить пользователю выбрать вариант из кэша нормализации
+  options: NormalizationOption[];
 }
 
 export interface CategoryFilter {
@@ -51,4 +61,26 @@ export type GetCategoryFiltersParams = z.infer<
 >;
 export type GetCategoryAttributesParams = z.infer<
   typeof getCategoryAttributesSchema.shape.params
+>;
+
+export type GetCategoryWithAttributesParams = z.infer<
+  typeof getCategoryWithAttributesSchema.shape.params
+>;
+
+export type CreateCategoryBody = z.infer<
+  typeof createCategorySchema.shape.body
+>;
+
+export type CreateCategoryAttributeParams = z.infer<
+  typeof createCategoryAttributeSchema.shape.params
+>;
+export type CreateCategoryAttributeBody = z.infer<
+  typeof createCategoryAttributeSchema.shape.body
+>;
+
+export type UpdateCategoryAttributeParams = z.infer<
+  typeof updateCategoryAttributeSchema.shape.params
+>;
+export type UpdateCategoryAttributeBody = z.infer<
+  typeof updateCategoryAttributeSchema.shape.body
 >;

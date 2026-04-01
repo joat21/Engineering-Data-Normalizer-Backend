@@ -1,10 +1,11 @@
-import { EquipmentSystemFields } from "../../types";
-import { Prisma } from "../../generated/prisma/client";
-import { prisma } from "../../prisma";
+import pMap from "p-map";
 import {
   DataType,
   SYSTEM_FIELDS_CONFIG,
 } from "@engineering-data-normalizer/shared";
+import { EquipmentSystemFields } from "../../types";
+import { Prisma } from "../../generated/prisma/client";
+import { prisma } from "../../prisma";
 
 export const recalculateFilters = async (categoryId: string) => {
   const category = await prisma.category.findUnique({
@@ -14,6 +15,7 @@ export const recalculateFilters = async (categoryId: string) => {
 
   if (!category) throw new Error("Category not found");
 
+  // Системных полей мало, поэтому все запросы через Promise.all
   const systemFieldFilters = await Promise.all(
     Object.entries(SYSTEM_FIELDS_CONFIG).map(async ([field, config]) => {
       const systemField = field as keyof EquipmentSystemFields;
@@ -52,8 +54,11 @@ export const recalculateFilters = async (categoryId: string) => {
     }),
   );
 
-  const attributeFilters = await Promise.all(
-    category.attributes.map(async (attr) => {
+  // Атрибутов может быть много, поэтому через p-map запросы будут идти в несколько потоков,
+  // чтобы не уронить БД и не схлопнуться из за таймаутов
+  const attributeFilters = await pMap(
+    category.attributes,
+    async (attr) => {
       const baseFilter = {
         categoryId,
         attributeId: attr.id,
@@ -97,7 +102,8 @@ export const recalculateFilters = async (categoryId: string) => {
       }
 
       return baseFilter;
-    }),
+    },
+    { concurrency: 5 },
   );
 
   const filterEntries: Prisma.CategoryFilterCreateManyInput[] = [

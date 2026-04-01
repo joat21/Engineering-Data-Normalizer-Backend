@@ -1,7 +1,11 @@
 import { Router } from "express";
 import {
+  createCategoryAttributeSchema,
+  createCategorySchema,
   getCategoryAttributesSchema,
   getCategoryFiltersSchema,
+  getCategoryWithAttributesSchema,
+  updateCategoryAttributeSchema,
 } from "@engineering-data-normalizer/shared";
 import { validate } from "../middleware/validate";
 import * as CategoryController from "../controllers/CategoryController";
@@ -20,6 +24,30 @@ router.get(
   "/:id/attributes",
   validate(getCategoryAttributesSchema),
   CategoryController.getCategoryAttributesHandler,
+);
+
+router.get(
+  "/:id",
+  validate(getCategoryWithAttributesSchema),
+  CategoryController.getCategoryWithAttributesHandler,
+);
+
+router.post(
+  "/",
+  validate(createCategorySchema),
+  CategoryController.createCategoryHandler,
+);
+
+router.post(
+  "/:id/attributes",
+  validate(createCategoryAttributeSchema),
+  CategoryController.createCategoryAttributeHandler,
+);
+
+router.patch(
+  "/attributes/:id",
+  validate(updateCategoryAttributeSchema),
+  CategoryController.updateCategoryAttributeHandler,
 );
 
 export default router;

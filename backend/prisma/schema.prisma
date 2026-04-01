@@ -68,6 +68,9 @@ model EquipmentAttributeValue {
   valueMax     Decimal?          @db.Decimal(12, 2)
   valueArray   Json?
   valueBoolean Boolean?
+
+  @@index([attributeId, valueString])
+  @@index([attributeId, valueMin, valueMax])
 }
 
 model Category {

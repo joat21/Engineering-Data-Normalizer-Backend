@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { NormalizedValue } from "@engineering-data-normalizer/shared";
-import { NormalizationOption } from "../services/NormalizationService/types";
+import {
+  NormalizationOption,
+  NormalizedValue,
+} from "@engineering-data-normalizer/shared";
 import { prisma } from "../prisma";
 
 export const getAttributeOptionsMap = async (
