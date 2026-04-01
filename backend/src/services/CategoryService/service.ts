@@ -4,6 +4,7 @@ import {
   CreateCategoryBody,
   DataType,
   MappingTargetType,
+  NormalizationOption,
   SYSTEM_FIELDS_CONFIG,
   UpdateCategoryAttributeBody,
   UpdateCategoryAttributeParams,
@@ -37,6 +38,15 @@ export const getCategoryAttributes = async (categoryId: string) => {
     orderBy: { label: "asc" },
   });
 
+  const [manufacturers, suppliers] = await Promise.all([
+    prisma.manufacturer.findMany({
+      orderBy: { name: "asc" },
+    }),
+    prisma.supplier.findMany({
+      orderBy: { name: "asc" },
+    }),
+  ]);
+
   const stringAttrIds = categoryAttributes
     .filter((attr) => attr.dataType === DataType.STRING)
     .map((attr) => attr.id);
@@ -44,16 +54,34 @@ export const getCategoryAttributes = async (categoryId: string) => {
   const optionsMap = await getAttributeOptionsMap(stringAttrIds);
 
   const systemFields = Object.entries(SYSTEM_FIELDS_CONFIG).map(
-    ([key, config]) => ({
-      id: key,
-      key: key,
-      type: MappingTargetType.SYSTEM,
-      label: config.label,
-      unit: null,
-      dataType: config.type,
-      isFilterable: true,
-      options: [],
-    }),
+    ([key, config]) => {
+      let options: NormalizationOption[] = [];
+
+      // костыльный костыль, таску на исправление себе уже записал
+      if (key === "manufacturerName")
+        options = manufacturers.map((m) => ({
+          id: m.id,
+          label: m.name,
+          normalized: { valueString: m.name },
+        }));
+      if (key === "supplierName")
+        options = suppliers.map((s) => ({
+          id: s.id,
+          label: s.name,
+          normalized: { valueString: s.name },
+        }));
+
+      return {
+        id: key,
+        key: key,
+        type: MappingTargetType.SYSTEM,
+        label: config.label,
+        unit: null,
+        dataType: config.type,
+        isFilterable: true,
+        options,
+      };
+    },
   );
 
   const attributes = categoryAttributes.map((attr) => {
