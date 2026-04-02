@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { Button, Spinner, useOverlayState } from "@heroui/react";
+import { Button, useOverlayState } from "@heroui/react";
 import { Plus, Save } from "lucide-react";
 import { ImportSuccessModal } from "./ImportSuccessModal";
 import { ResolveNormalizationIssuesModal } from "./ResolveNormalizationIssuesModal";
@@ -15,6 +15,7 @@ import {
 } from "@/features/import";
 import { useCategoryAttributes } from "@/entities/category-attribute";
 import { CreateCategoryAttributeModal } from "@/features/create-category-attibute";
+import { PageLoader } from "@/shared/ui";
 
 interface MapColumnsProps {
   sessionId: string;
@@ -40,7 +41,7 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
   const { data: attributes, isPending: isAttributesPending } =
     useCategoryAttributes(categoryId);
 
-  if (isTablePending || isAttributesPending) return <Spinner />;
+  if (isTablePending || isAttributesPending) return <PageLoader />;
   if (!table || !attributes) return "Произошла ошибка";
 
   const handleSave = () => {

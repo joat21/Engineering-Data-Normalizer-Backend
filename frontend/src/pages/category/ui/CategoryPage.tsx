@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { Button, Spinner, Table, useOverlayState } from "@heroui/react";
+import { Button, Table, useOverlayState } from "@heroui/react";
 import { useCategory } from "@/entities/category";
 import { CreateCategoryAttributeModal } from "@/features/create-category-attibute";
 import {
@@ -10,6 +10,7 @@ import {
 import { TableRow } from "./TableRow";
 import { HEADERS } from "../model/config";
 import { EditCategoryAttributeModal } from "@/features/edit-category-attribute";
+import { PageLoader } from "@/shared/ui";
 
 export const CategoryPage = () => {
   const { id = "" } = useParams();
@@ -38,7 +39,7 @@ export const CategoryPage = () => {
     return [systemFields, technicalFields];
   }, [category?.attributes]);
 
-  if (isPending) return <Spinner />;
+  if (isPending) return <PageLoader />;
 
   const handleOpenEditModal = (attrId: string) => {
     setSelectedAttributeId(attrId);

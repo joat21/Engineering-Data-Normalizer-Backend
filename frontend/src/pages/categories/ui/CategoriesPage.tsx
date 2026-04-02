@@ -1,14 +1,14 @@
-import { Button, Spinner, useOverlayState } from "@heroui/react";
+import { Button, useOverlayState } from "@heroui/react";
 import { useCategories } from "@/entities/category";
-import { AppLink, CategoryCard } from "@/shared/ui";
 import { CreateCategoryModal } from "@/features/create-category";
+import { AppLink, CategoryCard, PageLoader } from "@/shared/ui";
 
 export const CategoriesPage = () => {
   const createCategoryModal = useOverlayState();
 
   const { data: categories, isPending } = useCategories();
 
-  if (isPending) return <Spinner />;
+  if (isPending) return <PageLoader />;
 
   return (
     <>

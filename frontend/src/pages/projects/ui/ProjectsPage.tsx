@@ -1,12 +1,11 @@
-import { useProjects } from "@/entities/project";
-import { AppLink } from "@/shared/ui";
-import { Spinner } from "@heroui/react";
 import { ProjectCard } from "./ProjectCard";
+import { useProjects } from "@/entities/project";
+import { AppLink, PageLoader } from "@/shared/ui";
 
 export const ProjectsPage = () => {
   const { data: projects, isPending } = useProjects();
 
-  if (isPending) return <Spinner />;
+  if (isPending) return <PageLoader />;
 
   return (
     <div className="flex flex-col gap-3">

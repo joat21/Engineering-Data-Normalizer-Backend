@@ -1,21 +1,13 @@
 import { useState } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  Label,
-  Modal,
-  Spinner,
-  Tooltip,
-} from "@heroui/react";
+import { Button, Form, Input, Label, Modal, Tooltip } from "@heroui/react";
 import { List, Plus } from "lucide-react";
+import { resolveEntityId } from "../model/utils";
 import {
   useCreateManufacturerMutation,
   useManufacturers,
 } from "@/entities/manufacturer";
 import { useCreateSupplierMutation, useSuppliers } from "@/entities/supplier";
-import { AppSelect } from "@/shared/ui";
-import { resolveEntityId } from "../model/utils";
+import { AppSelect, PageLoader } from "@/shared/ui";
 
 interface CatalogCommonDataModalProps {
   isOpen: boolean;
@@ -38,7 +30,7 @@ export const CatalogCommonDataModal = ({
   const createManufacturerMutation = useCreateManufacturerMutation();
   const createSupplierMutation = useCreateSupplierMutation();
 
-  if (isManufacturersPending || isSuppliersPending) return <Spinner />;
+  if (isManufacturersPending || isSuppliersPending) return <PageLoader />;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

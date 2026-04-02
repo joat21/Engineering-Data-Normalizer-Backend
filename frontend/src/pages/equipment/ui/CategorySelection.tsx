@@ -1,11 +1,10 @@
-import { Spinner } from "@heroui/react";
 import { useCategories } from "@/entities/category";
-import { AppLink, CategoryCard } from "@/shared/ui";
+import { AppLink, CategoryCard, PageLoader } from "@/shared/ui";
 
 export const CategorySelection = () => {
   const { data: categories, isPending } = useCategories();
 
-  if (isPending) return <Spinner />;
+  if (isPending) return <PageLoader />;
 
   return (
     <div className="flex flex-col gap-8 mx-auto px-4 w-full max-w-350">

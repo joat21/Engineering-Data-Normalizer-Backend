@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Spinner, useOverlayState } from "@heroui/react";
+import { useOverlayState } from "@heroui/react";
 import {
   getCoreRowModel,
   useReactTable,
@@ -22,6 +22,7 @@ import {
   useEquipmentTable,
 } from "@/entities/equipment";
 import { AddToProjectModal } from "./AddToProjectModal";
+import { PageLoader } from "@/shared/ui";
 
 interface EquipmentBrowseProps {
   categoryId: string;
@@ -110,7 +111,7 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
     onColumnPinningChange: setColumnPinning,
   });
 
-  if (isEquipmentPending || isFiltersPending) return <Spinner />;
+  if (isEquipmentPending || isFiltersPending) return <PageLoader />;
   if (!equipmentData) return "Произошла ошибка";
 
   return (

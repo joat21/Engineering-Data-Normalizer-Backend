@@ -1,7 +1,8 @@
-import { Drawer, Spinner, Table } from "@heroui/react";
-import { useEquipmentDetails } from "../api/equipment.api";
-import { DetailsRow } from "./DetailsRow";
+import { Drawer, Table } from "@heroui/react";
 import { Download, FileText } from "lucide-react";
+import { DetailsRow } from "./DetailsRow";
+import { useEquipmentDetails } from "../api/equipment.api";
+import { PageLoader } from "@/shared/ui";
 
 interface EquipmentDetailsDrawerProps {
   equipmentId: string | null;
@@ -18,7 +19,7 @@ export const EquipmentDetailsDrawer = ({
     id: equipmentId ?? "",
   });
 
-  if (isPending) return <Spinner />;
+  if (isPending) return <PageLoader />;
 
   return (
     <Drawer.Backdrop isOpen={isOpen}>

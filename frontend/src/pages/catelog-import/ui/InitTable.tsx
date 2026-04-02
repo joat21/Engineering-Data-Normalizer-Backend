@@ -26,6 +26,7 @@ import {
   useImportStore,
   useInitImportMutation,
 } from "@/features/import";
+import { PageLoader } from "@/shared/ui";
 
 interface InitTableProps {
   categoryId: string;
@@ -134,7 +135,7 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
   };
 
   if (!file) return <div>Файл не найден в сторе. Вернитесь на шаг назад.</div>;
-  if (isLoading) return <div>Парсинг таблицы...</div>;
+  if (isLoading) return <PageLoader />;
 
   return (
     <>
