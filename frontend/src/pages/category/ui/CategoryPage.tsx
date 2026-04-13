@@ -61,10 +61,13 @@ export const CategoryPage = () => {
       <div className="flex flex-col gap-8 mx-auto px-4 w-full max-w-350">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <h1 className="text-3xl font-semibold">Управление атрибутами</h1>
+            <h1 className="text-3xl font-semibold">
+              Атрибуты категории{" "}
+              <span className="font-bold">{category?.name}</span>
+            </h1>
             <p>
-              Здесь вы можете создавать и редактировать атрибуты категории{" "}
-              <b>{category?.name}</b>
+              Определите состав данных, которые будут доступны для этой группы
+              оборудования
             </p>
           </div>
           <Button onPress={createCategoryAttributeModal.open}>

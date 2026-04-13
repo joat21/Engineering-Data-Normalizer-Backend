@@ -32,7 +32,7 @@ export const StringAttributeField = ({
             items={options.map((o) => ({ id: o.id, label: o.label }))}
             getItemKey={(o) => o.id}
             getItemLabel={(o) => o.label}
-            className="w-full cap"
+            className="w-full"
             aria-label={label}
             variant={variant}
           />

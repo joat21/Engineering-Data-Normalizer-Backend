@@ -93,6 +93,7 @@ model CategoryAttribute {
   isFilterable             Boolean
   filters                  CategoryFilter[]
   equipmentAttributeValues EquipmentAttributeValue[]
+  normalizationCaches      NormalizationCache[]
 }
 
 model CategoryFilter {
@@ -175,8 +176,9 @@ model StagingImportItem {
 }
 
 model NormalizationCache {
-  id           String @id @default(uuid()) @db.Uuid
-  attributeId  String @db.Uuid
+  id           String            @id @default(uuid()) @db.Uuid
+  attribute    CategoryAttribute @relation(fields: [attributeId], references: [id])
+  attributeId  String            @db.Uuid
   cleanedValue String
   rawValue     String
   normalized   Json

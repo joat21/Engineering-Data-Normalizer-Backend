@@ -15,11 +15,11 @@ export const EquipmentDetailsDrawer = ({
   isOpen,
   onClose,
 }: EquipmentDetailsDrawerProps) => {
-  const { data: details, isPending } = useEquipmentDetails({
+  const { data: details, isFetching } = useEquipmentDetails({
     id: equipmentId ?? "",
   });
 
-  if (isPending) return <PageLoader />;
+  if (isFetching) return <PageLoader />;
 
   return (
     <Drawer.Backdrop isOpen={isOpen}>

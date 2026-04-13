@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      // refetchOnWindowFocus: false,
     },
   },
   mutationCache: new MutationCache({

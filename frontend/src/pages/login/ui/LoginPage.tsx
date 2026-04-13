@@ -43,12 +43,14 @@ export const LoginPage = () => {
               inputMode="email"
               placeholder="Email"
               variant="secondary"
+              required
             />
             <Input
               name="password"
               type="password"
               placeholder="Пароль"
               variant="secondary"
+              required
             />
             <Button
               type="submit"

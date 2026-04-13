@@ -1,8 +1,9 @@
 import {
   DataType,
+  EnrichedTarget,
   MappingTargetType,
+  NormalizationIssue,
 } from "@engineering-data-normalizer/shared";
-import { EnrichedTarget, NormalizationIssue } from "./types";
 import { booleanNormalizationOptions } from "./config";
 import { getTargetKey } from "../../helpers/getTargetKey";
 import { getAttributeOptionsMap } from "../../helpers/getAttributeOptionsMap";

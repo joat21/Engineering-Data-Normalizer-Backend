@@ -83,6 +83,7 @@ export const CatalogCommonDataModal = ({
                         name="manufacturerName"
                         placeholder="Производитель"
                         className="w-full"
+                        variant="secondary"
                       />
                     ) : (
                       <AppSelect
@@ -93,6 +94,7 @@ export const CatalogCommonDataModal = ({
                         getItemKey={(m) => m.id}
                         getItemLabel={(m) => m.name}
                         className="w-full"
+                        variant="secondary"
                       />
                     )}
                     <Tooltip delay={0} closeDelay={0}>
@@ -116,6 +118,7 @@ export const CatalogCommonDataModal = ({
                         name="supplierName"
                         placeholder="Поставщик"
                         className="w-full"
+                        variant="secondary"
                       />
                     ) : (
                       <AppSelect
@@ -126,6 +129,7 @@ export const CatalogCommonDataModal = ({
                         getItemKey={(m) => m.id}
                         getItemLabel={(m) => m.name}
                         className="w-full"
+                        variant="secondary"
                       />
                     )}
                     <Tooltip delay={0} closeDelay={0}>
