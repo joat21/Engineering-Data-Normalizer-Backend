@@ -17,7 +17,9 @@ export const useAuthUser = () => {
   const user = qc.getQueryData<User>(["auth", "me"]);
 
   if (!user) {
-    throw new Error("useAuthUser used outside of AuthProvider");
+    throw new Error(
+      "useAuthUser was called, but user data is missing in cache. Make sure this component is wrapped in <RequireAuth />.",
+    );
   }
 
   return user;
