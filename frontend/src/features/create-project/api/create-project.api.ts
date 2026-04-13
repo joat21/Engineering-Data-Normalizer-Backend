@@ -3,7 +3,7 @@ import type { CreateProjectBody } from "@engineering-data-normalizer/shared";
 import { api } from "@/shared/api/base";
 
 export const createProject = (data: CreateProjectBody) =>
-  api.post("/projects", data);
+  api.post("/projects", data).then((r) => r.data);
 
 export const useCreateProjectMutation = () => {
   const qc = useQueryClient();

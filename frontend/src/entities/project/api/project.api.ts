@@ -1,6 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+  ExportProjectToExcelParams,
+  GetProjectDetailsParams,
   Project,
+  ProjectDetails,
   UpsertProjectItemBody,
   UpsertProjectItemParams,
 } from "@engineering-data-normalizer/shared";
@@ -20,11 +23,30 @@ export const addToProject = (
 ) =>
   api.post<void>(`/projects/${data.projectId}/items`, data).then((r) => r.data);
 
-export const useAddToProjectMutation = () =>
-  useMutation({
+export const useAddToProjectMutation = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
     mutationKey: ["projects", "add-item"],
     mutationFn: addToProject,
     meta: {
       successMessage: "Оборудование добавлено в проект",
     },
+    onSuccess: (_data, variables) =>
+      qc.invalidateQueries({ queryKey: ["projects", variables.projectId] }),
+  });
+};
+
+export const getProjectDetails = (data: GetProjectDetailsParams) =>
+  api.get<ProjectDetails>(`/projects/${data.id}`).then((r) => r.data);
+
+export const useProjectDetails = (data: GetProjectDetailsParams) =>
+  useQuery({
+    queryKey: ["projects", data.id],
+    queryFn: () => getProjectDetails(data),
+  });
+
+export const exportToExcel = (data: ExportProjectToExcelParams) =>
+  api.get(`/projects/${data.id}/xlsx`, {
+    responseType: "blob",
   });

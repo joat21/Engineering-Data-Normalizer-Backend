@@ -9,6 +9,7 @@ import { EquipmentPage } from "@/pages/equipment";
 import { ProjectsPage } from "@/pages/projects";
 import { CategoriesPage } from "@/pages/categories";
 import { CategoryPage } from "@/pages/category";
+import { ProjectDetailsPage } from "@/pages/project-details";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="categories/:id" element={<CategoryPage />} />
           <Route path="projects" element={<ProjectsPage />} />
+          <Route path="projects/:id" element={<ProjectDetailsPage />} />
         </Route>
       </Route>
 

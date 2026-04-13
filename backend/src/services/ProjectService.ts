@@ -72,11 +72,21 @@ export const exportProjectToExcel = async (projectId: string) => {
   const worksheet = workbook.addWorksheet("Оборудование");
 
   const columns = [
-    ...Object.entries(SYSTEM_FIELDS_CONFIG).map(([key, cfg]) => ({
-      header: cfg.label,
-      key: key,
-      width: 20,
-    })),
+    ...Object.entries(SYSTEM_FIELDS_CONFIG).map(([key, cfg]) => {
+      if (key === "price") {
+        return {
+          header: "Цена за ед.",
+          key: key,
+          width: 20,
+        };
+      }
+
+      return {
+        header: cfg.label,
+        key: key,
+        width: 20,
+      };
+    }),
     { header: "Кол-во", key: "amount", width: 10 },
     { header: "Итого", key: "total", width: 15 },
   ];
