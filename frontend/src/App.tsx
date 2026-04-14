@@ -10,6 +10,7 @@ import { ProjectsPage } from "@/pages/projects";
 import { CategoriesPage } from "@/pages/categories";
 import { CategoryPage } from "@/pages/category";
 import { ProjectDetailsPage } from "@/pages/project-details";
+import { ComparisonPage } from "@/pages/comparison";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
           </Route>
 
           <Route path="equipment" element={<EquipmentPage />} />
-          <Route path="comparison" element={<h1>Сравнение</h1>} />
+          <Route path="comparison" element={<ComparisonPage />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="categories/:id" element={<CategoryPage />} />
           <Route path="projects" element={<ProjectsPage />} />

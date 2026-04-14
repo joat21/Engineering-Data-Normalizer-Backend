@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   AddToComparisonBody,
-  EquipmentRow,
+  ComparisonCategory,
   RemoveFromComparisonParams,
 } from "@engineering-data-normalizer/shared";
 import { api } from "@/shared/api/base";
 
 export const getComparisonList = () =>
-  api.get<EquipmentRow[]>("/comparison").then((r) => r.data);
+  api.get<ComparisonCategory[]>("/comparison").then((r) => r.data);
 
 export const useComparison = () =>
   useQuery({ queryKey: ["comparison", "list"], queryFn: getComparisonList });
