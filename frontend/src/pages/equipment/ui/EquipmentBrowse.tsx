@@ -15,13 +15,11 @@ import { Pagination } from "./Pagination";
 import { Filters } from "./Filters";
 import { useEquipmentTableQuery } from "../model/useEquipmentTableQuery";
 import { buildColumns } from "../model/buildColumns";
+import { EquipmentDetailsDrawer } from "@/widgets/EquipmentDetailsDrawer";
+import { AddToProjectModal } from "@/features/add-to-project";
 import { useCategoryFilters } from "@/entities/category-filters";
 import { useAddToComparisonMutation } from "@/entities/comparison";
-import {
-  EquipmentDetailsDrawer,
-  useEquipmentTable,
-} from "@/entities/equipment";
-import { AddToProjectModal } from "./AddToProjectModal";
+import { useEquipmentTable } from "@/entities/equipment";
 import { PageLoader } from "@/shared/ui";
 
 interface EquipmentBrowseProps {
@@ -159,6 +157,8 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
         equipmentId={selectedEquipmentId}
         isOpen={equipmentDetailsDrawer.isOpen}
         onClose={equipmentDetailsDrawer.close}
+        onAddToProject={handleAddToProject}
+        onCompare={handleAddToComparison}
       />
     </>
   );

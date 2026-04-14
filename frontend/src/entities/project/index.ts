@@ -1,6 +1,5 @@
 export {
   useProjects,
-  useAddToProjectMutation,
   useProjectDetails,
   exportToExcel,
 } from "./api/project.api";

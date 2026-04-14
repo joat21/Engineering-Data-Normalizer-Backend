@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Modal } from "@heroui/react";
-import { useAddToProjectMutation, useProjects } from "@/entities/project";
+import { useAddToProjectMutation } from "../api/add-to-project.api";
+import { useProjects } from "@/entities/project";
 import { AppSelect } from "@/shared/ui";
 
 interface AddToProjectModalProps {

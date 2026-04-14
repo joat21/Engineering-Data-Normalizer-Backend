@@ -1,19 +1,23 @@
-import { Drawer, Table } from "@heroui/react";
-import { Download, FileText } from "lucide-react";
+import { Button, Drawer, Table } from "@heroui/react";
+import { Download, FileText, FolderKanban, GitCompare } from "lucide-react";
 import { DetailsRow } from "./DetailsRow";
-import { useEquipmentDetails } from "../api/equipment.api";
+import { useEquipmentDetails } from "@/entities/equipment";
 import { PageLoader } from "@/shared/ui";
 
 interface EquipmentDetailsDrawerProps {
   equipmentId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  onAddToProject: (equipmentId: string) => void;
+  onCompare: (equipmentId: string) => void;
 }
 
 export const EquipmentDetailsDrawer = ({
   equipmentId,
   isOpen,
   onClose,
+  onAddToProject,
+  onCompare,
 }: EquipmentDetailsDrawerProps) => {
   const { data: details, isFetching } = useEquipmentDetails({
     id: equipmentId ?? "",
@@ -32,6 +36,15 @@ export const EquipmentDetailsDrawer = ({
             </Drawer.Heading>
           </Drawer.Header>
           <Drawer.Body className="flex flex-col gap-6">
+            <div className="flex gap-3">
+              <Button onPress={() => onAddToProject(equipmentId!)}>
+                <FolderKanban />В проект
+              </Button>
+              <Button variant="outline" onPress={() => onCompare(equipmentId!)}>
+                <GitCompare />
+                Сравнить
+              </Button>
+            </div>
             <div className="flex flex-col gap-2">
               <span className="text-lg font-medium text-foreground">
                 Основные данные
