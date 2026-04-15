@@ -14,16 +14,16 @@ export const normalizeValue = (
   type: DataType,
   attributeId: string,
   cacheMap: Map<string, JsonValue>,
-): NormalizedValue | UnnormalizedValue =>
+): Array<NormalizedValue | UnnormalizedValue> =>
   type === DataType.NUMBER
     ? normalizeNumeric(rawValue, attributeId, cacheMap)
-    : normalizeStringOrBoolean(rawValue, attributeId, cacheMap);
+    : [normalizeStringOrBoolean(rawValue, attributeId, cacheMap)];
 
 const normalizeNumeric = (
   rawValue: string,
   attributeId: string,
   cacheMap: Map<string, JsonValue>,
-): NormalizedValue | UnnormalizedValue => {
+): Array<NormalizedValue | UnnormalizedValue> => {
   // Сплит по разделителям размерности,
   // чтобы отдельно обрабатывать части строк вида '1.25"x2"'
   const parts = rawValue
@@ -31,42 +31,37 @@ const normalizeNumeric = (
     .split(DIMENSION_SEPARATORS_REGEX)
     .filter((p) => p.length > 0);
 
-  const normalizedParts = parts.map((part) => {
+  // возврат массива,
+  // чтобы не потерять части составных значений (например, если 1.25" из 1.25"x2" нормализовать не удалось)
+  return parts.map((part) => {
     const partClean = part.trim();
     const partKey = `${attributeId}:${partClean}`;
 
     if (isSimpleNumeric(partClean)) {
       const nums = parseNumbers(partClean);
-      return { nums, needsCheck: false };
+      return {
+        valueString: partClean,
+        valueMin: nums.length > 0 ? Math.min(...nums) : undefined,
+        valueMax: nums.length > 0 ? Math.max(...nums) : undefined,
+        valueArray: nums.length >= 3 ? nums : undefined,
+      } as NormalizedValue;
     }
 
     if (cacheMap.has(partKey)) {
       const cached = cacheMap.get(partKey) as unknown as NormalizedValue;
-      const nums = [cached.valueMin, cached.valueMax].filter(
-        (v) => v !== undefined,
-      );
-      return { nums, needsCheck: false };
+      return {
+        valueString: partClean,
+        valueMin: cached.valueMin,
+        valueMax: cached.valueMax,
+        valueArray: cached.valueArray,
+      } as NormalizedValue;
     }
 
-    return { nums: parseNumbers(partClean), needsCheck: true };
-  });
-
-  const allNums = normalizedParts.flatMap((p) => p.nums);
-  const needsCheck = normalizedParts.some((p) => p.needsCheck);
-
-  if (needsCheck) {
     return {
-      valueString: rawValue.trim(),
-      needsCheck,
-    };
-  }
-
-  return {
-    valueString: rawValue.trim(),
-    valueMin: allNums.length > 0 ? Math.min(...allNums) : undefined,
-    valueMax: allNums.length > 0 ? Math.max(...allNums) : undefined,
-    valueArray: allNums.length >= 3 ? allNums : undefined,
-  };
+      valueString: partClean,
+      needsCheck: true,
+    } as UnnormalizedValue;
+  });
 };
 
 const normalizeStringOrBoolean = (

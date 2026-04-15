@@ -2,6 +2,7 @@ import {
   DataType,
   MappingTarget,
   MappingTargetType,
+  NormalizedValue,
 } from "@engineering-data-normalizer/shared";
 import { JsonValue } from "@prisma/client/runtime/client";
 import { AttributeInfo, MappingPlan, NormalizeSingleEntity } from "../types";
@@ -116,7 +117,7 @@ export const getMappingPlans = (
     if (target.type === MappingTargetType.SYSTEM) {
       return {
         target,
-        normalizer: (val: string) => ({ valueString: val }),
+        normalizer: (val: string) => [{ valueString: val } as NormalizedValue],
       };
     }
 

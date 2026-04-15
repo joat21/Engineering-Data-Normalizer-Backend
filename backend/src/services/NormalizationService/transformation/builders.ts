@@ -8,6 +8,7 @@ import { isNormalizedValue, MappingPlan, TransformedRow } from "../types";
 import { prisma } from "../../../prisma";
 import { buildBatchNormalizationContext } from "../normalization/context";
 import { getTargetKey } from "../../../helpers/getTargetKey";
+import { aggregateNormalizedParts } from "./aggregateNormalizedParts";
 
 const buildColumnMappings = (
   rawValue: any,
@@ -65,35 +66,50 @@ export const buildTransformedRows = async (params: {
       cacheMap,
     );
 
-    for (const mapping of columnMappings) {
-      if (isNormalizedValue(mapping.normalized)) continue;
+    // в columnMappings.mappingPlans[i].normalized лежит Array<NormalizedValue | UnnormalizedValue>
+    // из него собираем issues
+    // но для TransformedRow нужно этот массив объектов свернуть в один объект
+    const finalColumnMappings = columnMappings.map((mapping) => {
+      for (const value of mapping.normalized) {
+        if (isNormalizedValue(value)) continue;
 
-      const target = mapping.target;
-      const targetKey = getTargetKey(target);
+        const target = mapping.target;
+        const targetKey = getTargetKey(target);
 
-      if (!issuesMap.has(targetKey)) {
-        issuesMap.set(targetKey, {
-          target: {
-            ...target,
-            label:
-              attributeInfoMap.get(targetKey)?.label || "Неизвестный атрибут",
-            dataType:
-              attributeInfoMap.get(targetKey)?.dataType || DataType.STRING,
-          },
-          unnormalizedValues: new Set<string>(),
-        });
+        if (!issuesMap.has(targetKey)) {
+          issuesMap.set(targetKey, {
+            target: {
+              ...target,
+              label:
+                attributeInfoMap.get(targetKey)?.label || "Неизвестный атрибут",
+              dataType:
+                attributeInfoMap.get(targetKey)?.dataType || DataType.STRING,
+            },
+            unnormalizedValues: new Set<string>(),
+          });
+        }
+
+        const valueToAdd = value.valueString;
+        issuesMap.get(targetKey)?.unnormalizedValues.add(valueToAdd);
       }
 
-      const valueToAdd = mapping.normalized.valueString;
-      issuesMap.get(targetKey)?.unnormalizedValues.add(valueToAdd);
-    }
+      return {
+        target: mapping.target,
+        rawValue: mapping.rawValue,
+        // сворачиваем массив обратно в один объект
+        normalized: aggregateNormalizedParts(
+          mapping.normalized,
+          mapping.rawValue,
+        ),
+      };
+    });
 
     const existingRow =
       (item.transformedRow as unknown as TransformedRow) || {};
 
     const newData: TransformedRow = {
       ...existingRow,
-      [colIndex.toString()]: columnMappings,
+      [colIndex.toString()]: finalColumnMappings,
     };
 
     return {

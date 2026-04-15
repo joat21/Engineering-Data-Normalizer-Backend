@@ -26,7 +26,7 @@ export interface MappingPlan {
   normalizer: (
     val: string,
     cache: Map<string, JsonValue>,
-  ) => NormalizedValue | UnnormalizedValue;
+  ) => Array<NormalizedValue | UnnormalizedValue>;
 }
 
 export type TransformedRow = Record<string, NormalizedData[]>;
