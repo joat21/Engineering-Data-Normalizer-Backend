@@ -22,7 +22,7 @@ export const initImportHandler: HandlerFromSchema<
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const sessionId = await createSession({
+    const result = await createSession({
       categoryId,
       sourceType,
       file,
@@ -31,7 +31,7 @@ export const initImportHandler: HandlerFromSchema<
       supplierId,
     });
 
-    res.json({ sessionId });
+    res.json(result);
   } catch (error) {
     next(error);
   }

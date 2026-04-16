@@ -41,7 +41,7 @@ export const initImport = async ({ file, ...data }: InitImportArgs) => {
     }
   });
 
-  const response = await api.post<{ sessionId: string }>(
+  const response = await api.post<{ sessionId: string; pdfUrl: string }>(
     "/import/init",
     formData,
   );

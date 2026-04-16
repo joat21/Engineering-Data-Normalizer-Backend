@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Button, Card, toast, useOverlayState } from "@heroui/react";
-import { ArrowLeft, FileText, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import {
   MappingTargetType,
   type CategoryAttribute,
   type CreateEquipmentBody,
   type MappingTarget,
 } from "@engineering-data-normalizer/shared";
+import { PdfViewer } from "./PdfViewer";
 import { ImportSuccessModal } from "./ImportSuccessModal";
 import { SingleImportForm } from "./SingleImportForm";
 import { useCreateEquipmentMutation } from "../api/single-import.api";
@@ -24,12 +25,14 @@ interface SingleImportCreateProps {
     supplierId: string;
   }) => void;
   isLoadingSession: boolean;
+  fileUrl: string;
 }
 
 export const SingleImportCreate = ({
   attributes,
   onInitImport,
   isLoadingSession,
+  fileUrl,
 }: SingleImportCreateProps) => {
   const resetImport = useImportStore((s) => s.reset);
   const file = useImportStore((s) => s.file);
@@ -127,8 +130,6 @@ export const SingleImportCreate = ({
           <ArrowLeft className="mr-2" /> К выбору файла
         </Button>
 
-        {/* тут будет просмотр загруженного документа */}
-
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <h1 className="mb-2 text-2xl font-semibold">
@@ -146,24 +147,21 @@ export const SingleImportCreate = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-4 p-4 border rounded-lg w-full bg-white">
-            <FileText className="text-primary" size={32} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{file?.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {((file?.size ?? 0) / 1024).toFixed(2)} KB
-              </p>
-            </div>
+          <div className="flex gap-3">
+            <Card className="p-0 rounded-xl w-full min-w-0 min-h-0">
+              <PdfViewer fileUrl={fileUrl} />
+            </Card>
+            <Card className="p-6 rounded-xl w-full">
+              <SingleImportForm
+                key={formKey}
+                attributes={attributes}
+                onSubmit={handleSubmit}
+                isPending={
+                  createEquipmentMutation.isPending || isLoadingSession
+                }
+              />
+            </Card>
           </div>
-
-          <Card className="p-6 rounded-xl">
-            <SingleImportForm
-              key={formKey}
-              attributes={attributes}
-              onSubmit={handleSubmit}
-              isPending={createEquipmentMutation.isPending || isLoadingSession}
-            />
-          </Card>
         </div>
       </div>
 

@@ -5,22 +5,22 @@ import {
 } from "@engineering-data-normalizer/shared";
 import libre from "libreoffice-convert";
 import path from "path";
-import { promisify } from "util";
 import { AttributeInfo } from "../NormalizationService/types";
 import { CONVERTIBLE_EXTENSIONS } from "../../config";
-
-const convertAsync = promisify(libre.convert);
 
 export const processFileForPreview = async (
   file: Express.Multer.File,
 ): Promise<Buffer | null> => {
   const ext = path.extname(file.originalname).toLowerCase();
 
-  if (CONVERTIBLE_EXTENSIONS.includes(ext)) {
-    return await convertAsync(file.buffer, ".pdf", undefined);
-  }
+  if (!CONVERTIBLE_EXTENSIONS.includes(ext)) return null;
 
-  return null;
+  return await new Promise((resolve, reject) => {
+    libre.convert(file.buffer, ".pdf", undefined, (err, done) => {
+      if (err) return reject(err);
+      resolve(done);
+    });
+  });
 };
 
 export const getTargetLabel = (

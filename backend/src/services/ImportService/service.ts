@@ -45,7 +45,7 @@ export const createSession = async (data: {
   const isPdf = ext === ".pdf";
 
   if (!source) {
-    const mainKey = `imports/${fileHash}-${file.filename}.${ext}`;
+    const mainKey = `imports/${fileHash}-${file.originalname}`;
 
     originalUrl = await uploadToS3({
       key: mainKey,

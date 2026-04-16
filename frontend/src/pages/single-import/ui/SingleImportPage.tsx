@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SourceType } from "@engineering-data-normalizer/shared";
 import { SingleImportCreate } from "./SingleImportCreate";
 import {
@@ -19,6 +19,8 @@ export const SingleImportPage = () => {
   const resetImport = useImportStore((s) => s.reset);
 
   const initImportMutation = useInitImportMutation();
+
+  const [fileUrl, setFileUrl] = useState("");
 
   const { data: categoryAttributes } = useCategoryAttributes(categoryId ?? "");
 
@@ -41,6 +43,7 @@ export const SingleImportPage = () => {
           setSessionId(res.sessionId);
           setStep(SingleImportStep.FILL_ATTRIBUTES);
           setCategoryName(data.categoryName);
+          setFileUrl(res.pdfUrl);
         },
       },
     );
@@ -61,6 +64,7 @@ export const SingleImportPage = () => {
           attributes={categoryAttributes}
           onInitImport={handleInitImport}
           isLoadingSession={initImportMutation.isPending}
+          fileUrl={fileUrl}
         />
       )}
     </div>
