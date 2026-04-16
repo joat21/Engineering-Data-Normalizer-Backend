@@ -27,3 +27,21 @@ export const uploadFile = async (
 
   return `https://storage.yandexcloud.net/${bucketName}/${encodeURIComponent(key)}`;
 };
+
+export const uploadToS3 = async (params: {
+  key: string;
+  body: Buffer;
+  contentType: string;
+}) => {
+  const bucketName = process.env.BUCKET_NAME;
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: params.key,
+    Body: params.body,
+    ContentType: params.contentType,
+  });
+
+  await s3.send(command);
+
+  return `https://storage.yandexcloud.net/${bucketName}/${encodeURIComponent(params.key)}`;
+};

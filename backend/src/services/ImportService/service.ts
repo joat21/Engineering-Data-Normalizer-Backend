@@ -1,3 +1,4 @@
+import path from "path";
 import {
   StagingColumn,
   SourceType,
@@ -5,13 +6,14 @@ import {
 } from "@engineering-data-normalizer/shared";
 import { prisma } from "../../prisma";
 import { calculateHashAsync } from "../../helpers/calculateHashAsync";
-import { uploadFile } from "../S3Service";
+import { uploadFile, uploadToS3 } from "../S3Service";
 import { createSource } from "../SourceService";
 import { TransformedRow } from "../NormalizationService/types";
 import { getAttributeInfoMap } from "../../db/categoryAttribute";
 import { isSubColumn } from "./types";
-import { getTargetLabel } from "./helpers";
+import { getTargetLabel, processFileForPreview } from "./helpers";
 import { ApiError } from "../../exceptions/api-error";
+import { CONVERTIBLE_EXTENSIONS } from "../../config";
 
 export const createSession = async (data: {
   categoryId: string;
@@ -31,15 +33,39 @@ export const createSession = async (data: {
   } = data;
 
   const fileHash = await calculateHashAsync(file.buffer);
+
   let source = await prisma.source.findUnique({
     where: { fileHash },
   });
 
+  let originalUrl = source?.url;
+  let pdfUrl = "";
+
+  const ext = path.extname(file.originalname).toLowerCase();
+  const isPdf = ext === ".pdf";
+
   if (!source) {
-    const url = await uploadFile(file, fileHash);
+    const mainKey = `imports/${fileHash}-${file.filename}.${ext}`;
+
+    originalUrl = await uploadToS3({
+      key: mainKey,
+      body: file.buffer,
+      contentType: file.mimetype,
+    });
+
+    const pdfBuffer = await processFileForPreview(file);
+
+    if (pdfBuffer) {
+      await uploadToS3({
+        key: `${mainKey}.pdf`,
+        body: pdfBuffer,
+        contentType: "application/pdf",
+      });
+    }
+
     source = await createSource({
       fileName: file.originalname,
-      url,
+      url: originalUrl,
       fileHash,
       type: sourceType,
       manufacturerId,
@@ -47,17 +73,28 @@ export const createSession = async (data: {
     });
   }
 
+  if (isPdf) {
+    pdfUrl = originalUrl!;
+  } else if (CONVERTIBLE_EXTENSIONS.includes(ext)) {
+    pdfUrl = `${originalUrl}.pdf`;
+  } else {
+    pdfUrl = "";
+  }
+
   const session = await prisma.importSession.create({
     data: {
-      categoryId: categoryId,
+      categoryId,
       sourceId: source.id,
-      originHeader: originHeader,
+      originHeader,
       manufacturerId,
       supplierId,
     },
   });
 
-  return session.id;
+  return {
+    sessionId: session.id,
+    pdfUrl: pdfUrl,
+  };
 };
 
 export const addItemsToStaging = async (data: {

@@ -15,3 +15,5 @@ export const cookieOptions = {
   secure: true,
   path: "/",
 };
+
+export const CONVERTIBLE_EXTENSIONS = [".docx", ".doc", ".rtf", ".odt"];
