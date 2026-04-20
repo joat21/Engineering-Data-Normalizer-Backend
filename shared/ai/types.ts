@@ -4,6 +4,7 @@ import {
   aiParseTargetSchema,
   editAiParseResultsSchema,
   editedAiParseResultSchema,
+  parseFileSchema,
   saveAiParseSchema,
 } from "./schemas";
 
@@ -36,3 +37,5 @@ export type EditAiParseResultsParams = z.infer<
 export type EditAiParseResultsBody = z.infer<
   typeof editAiParseResultsSchema.shape.body
 >;
+
+export type ParseFileParams = z.infer<typeof parseFileSchema.shape.params>;

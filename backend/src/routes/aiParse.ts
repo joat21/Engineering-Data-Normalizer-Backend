@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   aiParseSchema,
   editAiParseResultsSchema,
+  parseFileSchema,
   saveAiParseSchema,
 } from "@engineering-data-normalizer/shared";
 import { validate } from "../middleware/validate";
@@ -25,6 +26,12 @@ router.post(
   "/:sessionId/commit",
   validate(saveAiParseSchema),
   NormalizationController.saveAiParseHandler,
+);
+
+router.get(
+  "/:importSessionId",
+  validate(parseFileSchema),
+  NormalizationController.parseFileHandler,
 );
 
 export default router;

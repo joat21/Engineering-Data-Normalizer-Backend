@@ -8,9 +8,10 @@ import { getRawValue } from "../../helpers/getRawValue";
 import { StagingImportItemStatus } from "../../types";
 import { ApiError } from "../../exceptions/api-error";
 import { llmParse } from "./parsers";
-import { chunkArray } from "./helpers";
+import { chunkArray, extractS3Key, extractTextFromFile } from "./helpers";
 import { CHUNK_SIZE, CONCURRENCY } from "./config";
 import pMap from "p-map";
+import { downloadFromS3 } from "../S3Service";
 
 export const processAiParsing = async (data: {
   importSessionId: string;
@@ -211,4 +212,33 @@ export const editAiParseResults = async (
   `;
 
   return { updated };
+};
+
+export const parseFile = async (importSessionId: string) => {
+  const session = await prisma.importSession.findUnique({
+    where: { id: importSessionId },
+    include: {
+      source: {
+        select: { url: true },
+      },
+      category: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!session?.source.url) {
+    throw new Error("Файл не найден в сессии импорта");
+  }
+
+  const fileUrl = session.source.url;
+  const extension = fileUrl.split(".").pop()?.toLowerCase();
+  const storageKey = extractS3Key(fileUrl);
+
+  const fileBuffer = await downloadFromS3(storageKey);
+  const extractedText = extractTextFromFile(fileBuffer, extension ?? "");
+
+  return extractedText;
 };

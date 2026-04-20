@@ -42,3 +42,9 @@ export const editAiParseResultsSchema = z.object({
     editedValues: z.array(editedAiParseResultSchema),
   }),
 });
+
+export const parseFileSchema = z.object({
+  params: z.object({
+    importSessionId: z.string(),
+  }),
+});

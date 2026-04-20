@@ -6,6 +6,7 @@ import {
   mapColToAttrSchema,
   resolveNormalizationIssuesSchema,
   transformConfigSchema,
+  parseFileSchema,
 } from "@engineering-data-normalizer/shared";
 import {
   commitAiParsingResults,
@@ -16,6 +17,7 @@ import {
 import { HandlerFromSchema } from "../types/zod";
 import {
   editAiParseResults,
+  parseFile,
   processAiParsing,
 } from "../services/AIService/service";
 
@@ -90,6 +92,17 @@ export const editAiParseResultsHandler: HandlerFromSchema<
       req.params.sessionId,
       req.body.editedValues,
     );
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const parseFileHandler: HandlerFromSchema<
+  typeof parseFileSchema
+> = async (req, res, next) => {
+  try {
+    const result = await parseFile(req.params.importSessionId);
     res.json(result);
   } catch (error) {
     next(error);
