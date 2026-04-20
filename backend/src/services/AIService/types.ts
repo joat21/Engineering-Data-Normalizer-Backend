@@ -1,12 +1,18 @@
-export type AiParseResult = {
+export type AiBatchParseResult = {
   rowId: string;
   sourceString: string;
   extracted: Record<string, string | number | boolean | null>;
 };
 
-export type ParseResultData = {
+export type AiSingleParseResult = Record<string, string>;
+
+export type AiBatchParseResultData = AiParseResultData<AiBatchParseResult[]>;
+
+export type AiSingleParseResultData = AiParseResultData<AiSingleParseResult>;
+
+export type AiParseResultData<T> = {
   tokensUsage: object | string;
-  parsed: AiParseResult[];
+  parsed: T;
   responseText: string;
   modelName: string;
 };

@@ -1,17 +1,17 @@
+import pMap from "p-map";
 import {
   EditedAiParseResult,
   AIParseTarget,
 } from "@engineering-data-normalizer/shared";
+import { downloadFromS3 } from "../S3Service";
+import { llmBatchParse, llmSingleParse } from "./parsers";
+import { chunkArray, extractS3Key, extractTextFromFile } from "./helpers";
+import { CHUNK_SIZE, CONCURRENCY } from "./config";
 import { prisma } from "../../prisma";
 import { Prisma } from "../../generated/prisma/client";
 import { getRawValue } from "../../helpers/getRawValue";
 import { StagingImportItemStatus } from "../../types";
 import { ApiError } from "../../exceptions/api-error";
-import { llmParse } from "./parsers";
-import { chunkArray, extractS3Key, extractTextFromFile } from "./helpers";
-import { CHUNK_SIZE, CONCURRENCY } from "./config";
-import pMap from "p-map";
-import { downloadFromS3 } from "../S3Service";
 
 export const processAiParsing = async (data: {
   importSessionId: string;
@@ -81,7 +81,7 @@ export const processAiParsing = async (data: {
   const batchResults = await pMap(
     chunks,
     async (chunk) => {
-      return await llmParse(chunk, targets, importSession.category.name);
+      return await llmBatchParse(chunk, targets, importSession.category.name);
     },
     { concurrency: CONCURRENCY },
   );
@@ -222,8 +222,8 @@ export const parseFile = async (importSessionId: string) => {
         select: { url: true },
       },
       category: {
-        select: {
-          name: true,
+        include: {
+          attributes: true,
         },
       },
     },
@@ -238,7 +238,13 @@ export const parseFile = async (importSessionId: string) => {
   const storageKey = extractS3Key(fileUrl);
 
   const fileBuffer = await downloadFromS3(storageKey);
-  const extractedText = extractTextFromFile(fileBuffer, extension ?? "");
+  const extractedText = await extractTextFromFile(fileBuffer, extension ?? "");
 
-  return extractedText;
+  const parseResult = await llmSingleParse(
+    extractedText,
+    session.category.name,
+    session.category.attributes,
+  );
+
+  return parseResult;
 };

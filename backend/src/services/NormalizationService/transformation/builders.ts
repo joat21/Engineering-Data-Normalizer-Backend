@@ -8,7 +8,7 @@ import { isNormalizedValue, MappingPlan, TransformedRow } from "../types";
 import { prisma } from "../../../prisma";
 import { buildBatchNormalizationContext } from "../normalization/context";
 import { getTargetKey } from "../../../helpers/getTargetKey";
-import { aggregateNormalizedParts } from "./aggregateNormalizedParts";
+import { aggregateNormalizedParts } from "../../../helpers/aggregateNormalizedParts";
 
 const buildColumnMappings = (
   rawValue: any,

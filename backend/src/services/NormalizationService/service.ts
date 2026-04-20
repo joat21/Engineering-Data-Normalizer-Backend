@@ -16,6 +16,7 @@ import { cleanValue } from "../../helpers/cleanValue";
 import { getTargetKey } from "../../helpers/getTargetKey";
 import { getAttributeInfoMap } from "../../db/categoryAttribute";
 import { ApiError } from "../../exceptions/api-error";
+import { aggregateNormalizedParts } from "../../helpers/aggregateNormalizedParts";
 
 export const mapColumnToAttribute = async (params: {
   sessionId: string;
@@ -175,7 +176,7 @@ export const normalizeSingleEntity = async (params: {
       return {
         target: plan.target,
         rawValue,
-        normalized,
+        normalized: aggregateNormalizedParts(normalized, rawValue),
       };
     })
     .filter((r): r is NormalizedData => r !== null);

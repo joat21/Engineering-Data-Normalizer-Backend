@@ -1,5 +1,8 @@
 import { NormalizedValue } from "@engineering-data-normalizer/shared";
-import { isNormalizedValue, UnnormalizedValue } from "../types";
+import {
+  isNormalizedValue,
+  UnnormalizedValue,
+} from "../services/NormalizationService/types";
 
 export const aggregateNormalizedParts = (
   parts: Array<NormalizedValue | UnnormalizedValue>,
