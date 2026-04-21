@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button, ButtonGroup, Card, Chip, Tabs, Tooltip } from "@heroui/react";
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  Chip,
+  Tabs,
+  toast,
+  Tooltip,
+} from "@heroui/react";
 import { cn } from "@heroui/styles";
 import * as XLSX from "xlsx";
 import { ArrowRight, LayoutGrid, RotateCcw, Table } from "lucide-react";
@@ -99,6 +107,12 @@ export const InitTable = ({ categoryId }: InitTableProps) => {
     if (!headerRange || !bodyRange || !file) return;
 
     const { headers, body } = extractTableData(data, headerRange, bodyRange);
+
+    if (headers.length !== body[0].length) {
+      return toast.danger(
+        "Шапка и данные должны содержать одинаковое количество колонок",
+      );
+    }
 
     try {
       const { sessionId } = await initImportMutation.mutateAsync({
