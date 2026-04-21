@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Button, Label, Tooltip } from "@heroui/react";
 import { ArrowLeftRight, Variable } from "lucide-react";
-import type { BaseAttributeFieldProps, NumberFieldProps } from "../model/types";
+import type { NumberFieldProps } from "../model/types";
 import { AppNumberField } from "@/shared/ui";
 
 export const NumberAttributeField = ({
@@ -10,36 +11,59 @@ export const NumberAttributeField = ({
   unit,
   variant,
 }: NumberFieldProps) => {
+  const { control, setValue } = useFormContext();
+  const valMin = useWatch({ control, name: `${attributeKey}_valueMin` });
+  const valMax = useWatch({ control, name: `${attributeKey}_valueMax` });
+
   const [isRange, setIsRange] = useState(false);
+
+  useEffect(() => {
+    if (valMin !== undefined && valMax !== undefined && valMin !== valMax) {
+      setIsRange(true);
+    }
+  }, [valMin, valMax]);
+
+  const toggleRange = () => {
+    if (isRange) {
+      setValue(`${attributeKey}_valueMax`, undefined);
+    }
+    setIsRange(!isRange);
+  };
 
   return (
     <div className="flex flex-col gap-2 group">
       <div className="flex justify-between items-end px-1">
         <Label className="text-base">
-          {label}{" "}
-          {unit && <span className="text-foreground/80 ml-1">({unit})</span>}
+          {label} {unit && `(${unit})`}
         </Label>
       </div>
 
       <div className="flex gap-2 items-start">
         <div className="flex-1">
           {isRange ? (
-            <RangeField
-              variant={variant}
-              attributeKey={attributeKey}
-              label={label}
-            />
+            <div className="flex gap-1">
+              <NumericController
+                name={`${attributeKey}_valueMin`}
+                label="Минимум"
+                variant={variant}
+              />
+              <NumericController
+                name={`${attributeKey}_valueMax`}
+                label="Максимум"
+                variant={variant}
+              />
+            </div>
           ) : (
-            <ExactField
-              variant={variant}
-              attributeKey={attributeKey}
+            <NumericController
+              name={`${attributeKey}_valueMin`}
               label={label}
+              variant={variant}
             />
           )}
         </div>
 
         <Tooltip delay={0} closeDelay={0}>
-          <Button isIconOnly onPress={() => setIsRange(!isRange)}>
+          <Button isIconOnly onPress={toggleRange}>
             {isRange ? <Variable /> : <ArrowLeftRight />}
           </Button>
           <Tooltip.Content>
@@ -51,40 +75,29 @@ export const NumberAttributeField = ({
   );
 };
 
-const ExactField = ({
-  attributeKey,
+const NumericController = ({
+  name,
   label,
   variant,
-}: BaseAttributeFieldProps) => {
+}: {
+  name: string;
+  label: string;
+  variant: any;
+}) => {
+  const { control } = useFormContext();
   return (
-    <AppNumberField
-      aria-label={label}
-      name={`${attributeKey}_valueMin`}
-      placeholder={label}
-      variant={variant}
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <AppNumberField
+          aria-label={label}
+          placeholder={label}
+          variant={variant}
+          className="w-full"
+          {...field}
+        />
+      )}
     />
-  );
-};
-
-const RangeField = ({
-  attributeKey,
-  label,
-  variant,
-}: BaseAttributeFieldProps) => {
-  return (
-    <div className="flex gap-1">
-      <AppNumberField
-        aria-label={label}
-        name={`${attributeKey}_valueMin`}
-        placeholder="Минимум"
-        variant={variant}
-      />
-      <AppNumberField
-        aria-label={label}
-        name={`${attributeKey}_valueMax`}
-        placeholder="Максимум"
-        variant={variant}
-      />
-    </div>
   );
 };

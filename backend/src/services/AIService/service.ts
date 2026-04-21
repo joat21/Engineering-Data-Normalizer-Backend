@@ -3,7 +3,7 @@ import {
   EditedAiParseResult,
   AIParseTarget,
   MappingTargetType,
-  NormalizedValue,
+  AiParseFileResult,
 } from "@engineering-data-normalizer/shared";
 import { downloadFromS3 } from "../S3Service";
 import { llmBatchParse, llmSingleParse } from "./parsers";
@@ -264,17 +264,14 @@ export const parseFile = async (importSessionId: string) => {
 
   const normalizedData = await normalizeSingleImport(entitiesToNormalize);
 
-  return normalizedData.reduce(
-    (acc, item) => {
-      const key =
-        item.target.type === MappingTargetType.SYSTEM
-          ? item.target.field
-          : item.target.id;
+  return normalizedData.reduce((acc, item) => {
+    const key =
+      item.target.type === MappingTargetType.SYSTEM
+        ? item.target.field
+        : item.target.id;
 
-      acc[key] = item.normalized;
+    acc[key] = item.normalized;
 
-      return acc;
-    },
-    {} as Record<string, NormalizedValue>,
-  );
+    return acc;
+  }, {} as AiParseFileResult);
 };

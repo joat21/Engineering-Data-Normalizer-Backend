@@ -29,7 +29,7 @@ router.post(
 );
 
 router.get(
-  "/:importSessionId",
+  "/:importSessionId/parse-file",
   validate(parseFileSchema),
   NormalizationController.parseFileHandler,
 );

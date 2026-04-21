@@ -4,9 +4,9 @@ import {
   type MappingTarget,
 } from "@engineering-data-normalizer/shared";
 import { useTransformationContextStore } from "../model/store";
+import { transformAttribute } from "../model/transformAttribute";
 import { useResolveNormalizationIssuesMutation } from "@/features/import";
 import { AttributeField } from "@/entities/category-attribute";
-import { transformAttribute } from "@/pages/single-import/model/transformAttribute";
 
 const getTargetKey = (target: MappingTarget) =>
   target.type === MappingTargetType.ATTRIBUTE ? target.id : target.field;

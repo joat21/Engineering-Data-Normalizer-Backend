@@ -7,6 +7,7 @@ import {
   parseFileSchema,
   saveAiParseSchema,
 } from "./schemas";
+import type { NormalizedValue } from "../normalization";
 
 export type AIParseTarget = z.infer<typeof aiParseTargetSchema>;
 export type EditedAiParseResult = z.infer<typeof editedAiParseResultSchema>;
@@ -23,6 +24,8 @@ export type AiParseColumnResult = {
     values: any[];
   }[];
 };
+
+export type AiParseFileResult = Record<string, NormalizedValue>;
 
 export type SaveAiParseResultsParams = z.infer<
   typeof saveAiParseSchema.shape.params

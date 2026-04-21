@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Button, Card, toast, useOverlayState } from "@heroui/react";
+import type { FieldValues } from "react-hook-form";
 import { ArrowLeft, Plus } from "lucide-react";
 import {
   MappingTargetType,
@@ -11,10 +12,14 @@ import {
 import { PdfViewer } from "./PdfViewer";
 import { ImportSuccessModal } from "./ImportSuccessModal";
 import { SingleImportForm } from "./SingleImportForm";
-import { useCreateEquipmentMutation } from "../api/single-import.api";
+import {
+  useAiParseFile,
+  useCreateEquipmentMutation,
+} from "../api/single-import.api";
 import { transformAttribute } from "../model/transformAttribute";
 import { SingleImportStep, useImportStore } from "@/features/import";
 import { CreateCategoryAttributeModal } from "@/features/create-category-attibute";
+import { AiParsingAlert } from "./AiParsingAlert";
 
 interface SingleImportCreateProps {
   attributes: CategoryAttribute[] | undefined;
@@ -47,13 +52,16 @@ export const SingleImportCreate = ({
   const createCategoryAttributeModal = useOverlayState();
 
   const [formKey, setFormKey] = useState(0);
+  const formRef = useRef<{ fillFromAi: () => void }>(null);
+
+  const { data: aiParseResult, isLoading: isAiParseResultLoading } =
+    useAiParseFile({
+      importSessionId: useImportStore.getState().sessionId!,
+    });
 
   const createEquipmentMutation = useCreateEquipmentMutation();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
+  const handleSubmit = (data: FieldValues) => {
     const sessionId = useImportStore.getState().sessionId;
 
     const normalizedData = attributes?.map((attr) => {
@@ -65,12 +73,9 @@ export const SingleImportCreate = ({
             }
           : { type: attr.type, field: attr.key as any }; // TODO: в идеале типизировать как системное поле
 
-      const { normalized, rawValue } = transformAttribute({ formData, attr });
-
       return {
         target,
-        rawValue,
-        normalized,
+        ...transformAttribute({ data, attr }),
       };
     });
 
@@ -97,9 +102,11 @@ export const SingleImportCreate = ({
       return toast.danger("Заполните хотя бы один атрибут");
     }
 
-    createEquipmentMutation.mutate(payload, {
-      onSuccess: () => successModal.open(),
-    });
+    console.log(payload);
+
+    // createEquipmentMutation.mutate(payload, {
+    //   onSuccess: () => successModal.open(),
+    // });
   };
 
   const handleFinish = () => {
@@ -151,11 +158,22 @@ export const SingleImportCreate = ({
             <Card className="p-0 rounded-xl w-full min-w-0 min-h-0">
               <PdfViewer fileUrl={fileUrl} />
             </Card>
-            <Card className="p-6 rounded-xl w-full">
+            <Card className="gap-4 p-6 rounded-xl w-full">
+              <AiParsingAlert
+                isLoading={isAiParseResultLoading}
+                count={
+                  Object.values(aiParseResult ?? {}).filter(
+                    (val) => val.valueString,
+                  ).length
+                }
+                onFillFromAi={() => formRef.current?.fillFromAi()}
+              />
               <SingleImportForm
+                ref={formRef}
                 key={formKey}
                 attributes={attributes}
                 onSubmit={handleSubmit}
+                aiParseResult={aiParseResult ?? {}}
                 isPending={
                   createEquipmentMutation.isPending || isLoadingSession
                 }

@@ -4,26 +4,29 @@ import type {
 } from "@engineering-data-normalizer/shared";
 
 interface TransformAttributeArgs {
-  data: Record<string, any>;
+  formData: FormData;
   attr: CategoryAttribute;
 }
 
-export const transformAttribute = ({ data, attr }: TransformAttributeArgs) => {
+export const transformAttribute = ({
+  formData,
+  attr,
+}: TransformAttributeArgs) => {
   switch (attr.dataType) {
     case "STRING":
-      return transformStringAttribute(data, attr);
+      return transformStringAttribute(formData, attr);
     case "NUMBER":
-      return transformNumberAttribute(data, attr.id);
+      return transformNumberAttribute(formData, attr.key);
     case "BOOLEAN":
-      return transformBooleanAttribute(data, attr.id);
+      return transformBooleanAttribute(formData, attr.key);
   }
 };
 
 const transformStringAttribute = (
-  data: Record<string, any>,
+  formData: FormData,
   attr: CategoryAttribute,
 ) => {
-  const strVal = String(data[attr.id] ?? "");
+  const strVal = String(formData.get(attr.key) ?? "");
   let rawValue = strVal;
   let normalized: NormalizedValue = { valueString: strVal };
 
@@ -39,15 +42,12 @@ const transformStringAttribute = (
   return { normalized, rawValue };
 };
 
-const transformNumberAttribute = (
-  data: Record<string, any>,
-  attrKey: string,
-) => {
+const transformNumberAttribute = (formData: FormData, attrKey: string) => {
   let rawValue = "";
   let normalized: NormalizedValue = { valueString: "" };
 
-  const rawMin = String(data[`${attrKey}_valueMin`] ?? "");
-  const rawMax = String(data[`${attrKey}_valueMax`] ?? "");
+  const rawMin = formData.get(`${attrKey}_valueMin`) ?? "";
+  const rawMax = formData.get(`${attrKey}_valueMax`) ?? "";
 
   let min = rawMin !== "" ? Number(rawMin) : null;
   let max = rawMax !== "" ? Number(rawMax) : null;
@@ -59,21 +59,18 @@ const transformNumberAttribute = (
   if (min !== null && max === null) max = min;
   if (max !== null && min === null) min = max;
 
-  return {
-    rawValue: min === max ? `${min}` : `${min} - ${max}`,
-    normalized: {
-      valueMin: min ?? undefined,
-      valueMax: max ?? undefined,
-      valueString: rawValue,
-    },
+  rawValue = min === max ? `${min}` : `${min} - ${max}`;
+  normalized = {
+    valueMin: min ?? undefined,
+    valueMax: max ?? undefined,
+    valueString: rawValue,
   };
+
+  return { normalized, rawValue };
 };
 
-const transformBooleanAttribute = (
-  data: Record<string, any>,
-  attrKey: string,
-) => {
-  const boolVal = !!data[attrKey];
+const transformBooleanAttribute = (formData: FormData, attrKey: string) => {
+  const boolVal = formData.get(attrKey) === "on";
   const rawValue = boolVal ? "Да" : "Нет";
   const normalized: NormalizedValue = {
     valueString: rawValue,
