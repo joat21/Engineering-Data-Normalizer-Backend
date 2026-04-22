@@ -5,10 +5,12 @@ import {
   Equipment,
   Manufacturer as PrismaManufacturer,
   Supplier as PrismaSupplier,
+  Currency as PrismaCurrency,
 } from "../generated/prisma/client";
 
 export type Manufacturer = PrismaManufacturer;
 export type Supplier = PrismaSupplier;
+export type Currency = PrismaCurrency;
 
 export const ImportSessionStatus = ImportStatus;
 export type ImportSessionStatus =

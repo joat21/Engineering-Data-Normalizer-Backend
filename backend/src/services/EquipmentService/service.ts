@@ -34,7 +34,7 @@ export const createEquipmentFromStaging = async (sessionId: string) => {
       sourceId: true,
       manufacturer: true,
       supplier: true,
-      currencyId: true,
+      currency: true,
     },
   });
 
@@ -42,7 +42,7 @@ export const createEquipmentFromStaging = async (sessionId: string) => {
     throw ApiError.NotFound("Сессия импорта не найдена");
   }
 
-  const { categoryId, sourceId, manufacturer, supplier, currencyId } = session;
+  const { categoryId, sourceId, manufacturer, supplier, currency } = session;
 
   // TODO: есть похожая функция в db/categoryAttributes
   // в идеале ее переиспользовать
@@ -76,7 +76,7 @@ export const createEquipmentFromStaging = async (sessionId: string) => {
       sourceId,
       manufacturer,
       supplier,
-      currencyId,
+      currency,
       normalizedData: Object.values(transformedRow).flat(),
       attributeInfoMap,
     });
@@ -130,7 +130,7 @@ export const createEquipment = async (data: {
       sourceId: true,
       manufacturer: true,
       supplier: true,
-      currencyId: true,
+      currency: true,
     },
   });
 
@@ -138,7 +138,7 @@ export const createEquipment = async (data: {
     throw ApiError.NotFound("Сессия импорта не найдена");
   }
 
-  const { categoryId, sourceId, manufacturer, supplier, currencyId } = session;
+  const { categoryId, sourceId, manufacturer, supplier, currency } = session;
 
   const categoryAttributes = await prisma.categoryAttribute.findMany({
     where: { categoryId: session.categoryId },
@@ -157,7 +157,7 @@ export const createEquipment = async (data: {
     sourceId,
     manufacturer,
     supplier,
-    currencyId,
+    currency,
     normalizedData: normalizedData,
     attributeInfoMap,
   });

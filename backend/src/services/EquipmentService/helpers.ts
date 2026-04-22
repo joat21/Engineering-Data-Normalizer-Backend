@@ -12,12 +12,13 @@ import {
 } from "@engineering-data-normalizer/shared";
 import { prisma } from "../../prisma";
 import { SYSTEM_FIELDS } from "../../config";
+import { Prisma } from "../../generated/prisma/client";
 import {
-  Equipment,
-  EquipmentAttributeValue,
-  Prisma,
-} from "../../generated/prisma/client";
-import { EquipmentSystemFields, Manufacturer, Supplier } from "../../types";
+  Currency,
+  EquipmentSystemFields,
+  Manufacturer,
+  Supplier,
+} from "../../types";
 import { getCacheableCleanedValues } from "../../helpers/cache";
 import { getAttributeInfoMap } from "../../db/categoryAttribute";
 
@@ -78,7 +79,7 @@ export const collectEquipmentAndAttributes = (data: {
   sourceId: string;
   manufacturer: Manufacturer | null;
   supplier: Supplier | null;
-  currencyId: string | null;
+  currency: Currency | null;
   normalizedData: NormalizedData[];
   attributeInfoMap: Map<
     string,
@@ -90,7 +91,7 @@ export const collectEquipmentAndAttributes = (data: {
     sourceId,
     manufacturer,
     supplier,
-    currencyId,
+    currency,
     normalizedData,
     attributeInfoMap,
   } = data;
@@ -109,8 +110,9 @@ export const collectEquipmentAndAttributes = (data: {
     manufacturerName: manufacturer?.name || null,
     supplierName: supplier?.name || null,
     supplierId: supplier?.id || null,
-    currencyId,
-    price: new Prisma.Decimal(0),
+    currencyId: currency?.id,
+    price: 0,
+    priceInRub: 0,
   };
 
   const entryAttributes: Prisma.EquipmentAttributeValueCreateManyInput[] = [];
@@ -123,7 +125,9 @@ export const collectEquipmentAndAttributes = (data: {
 
       // TODO: в идеале сделать обработку по типу атрибута, а не по самому атрибуту
       if (field === SYSTEM_FIELDS.PRICE) {
-        equipmentEntry.price = new Prisma.Decimal(normalized.valueString ?? 0);
+        const price = Number(normalized.valueString ?? 0);
+        equipmentEntry.price = price;
+        equipmentEntry.priceInRub = Number(price) * Number(currency?.rate || 1);
       } else {
         // и добавить обработку булевых значений
         equipmentEntry[field] = normalized.valueString;
