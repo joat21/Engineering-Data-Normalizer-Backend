@@ -22,6 +22,7 @@ import { TransformedRow } from "../NormalizationService/types";
 import { recalculateFilters } from "../CategoryService/recalculateFilters";
 import { EquipmentSystemFields, ImportSessionStatus } from "../../types";
 import { ApiError } from "../../exceptions/api-error";
+import { SYSTEM_FIELDS } from "../../config";
 
 const LIMIT = 20;
 
@@ -270,6 +271,11 @@ export const getEquipmentTable = async (data: {
     }),
   ]);
 
+  const currencies = await prisma.currency.findMany();
+  const exchangeRatesMap = new Map(
+    currencies.map((curr) => [curr.id, curr.rate]),
+  );
+
   const headers: EquipmentHeader[] = [
     ...categoryFilters.map((f) => ({
       key: f.systemField || `attr_${f.attributeId}`,
@@ -280,13 +286,25 @@ export const getEquipmentTable = async (data: {
     })),
   ];
 
-  const rows = equipment.map((item) => {
+  const rows = equipment.map((item, i) => {
     const row: EquipmentRow = { id: item.id };
 
     categoryFilters
       .filter((f) => f.systemField)
       .forEach((f) => {
-        row[f.systemField!] = (item as any)[f.systemField!];
+        const fieldName = f.systemField!;
+        let value = (item as any)[fieldName];
+
+        // костыль? костыль
+        if (fieldName === SYSTEM_FIELDS.PRICE) {
+          const rate = item.currencyId
+            ? exchangeRatesMap.get(item.currencyId)
+            : 1;
+
+          value = (Number(value) * Number(rate)).toFixed(2);
+        }
+
+        row[fieldName] = value;
       });
 
     const valuesMap = new Map(item.attributes.map((a) => [a.attributeId, a]));
@@ -317,6 +335,7 @@ export const getEquipmentDetails = async (id: string) => {
     where: { id },
     include: {
       source: true,
+      currency: true,
       attributes: {
         include: {
           attribute: true,
@@ -329,14 +348,25 @@ export const getEquipmentDetails = async (id: string) => {
     throw ApiError.NotFound("Оборудование не найдено");
   }
 
+  const priceInRub =
+    item.price && item.currency
+      ? Number(item.price) * Number(item.currency.rate)
+      : null;
+
   const systemFields = Object.entries(SYSTEM_FIELDS_CONFIG).map(
     ([key, config]) => {
       const systemField = key as keyof EquipmentSystemFields;
-      const value = item[systemField] ? String(item[systemField]) : null;
+      let value = item[systemField] ? String(item[systemField]) : null;
+
+      // костыль? костыль
+      if (systemField === SYSTEM_FIELDS.PRICE && priceInRub !== null) {
+        value = String(priceInRub.toFixed(2));
+      }
 
       return {
         label: config.label,
         value,
+        unit: config.unit,
       };
     },
   );

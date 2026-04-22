@@ -1,13 +1,17 @@
 import { DataType } from "../category";
 
 export const SYSTEM_FIELDS_CONFIG = {
-  name: { label: "Название", type: DataType.STRING },
-  manufacturerName: { label: "Производитель", type: DataType.STRING },
-  supplierName: { label: "Поставщик", type: DataType.STRING },
-  article: { label: "Артикул", type: DataType.STRING },
-  model: { label: "Модель", type: DataType.STRING },
-  externalCode: { label: "Код", type: DataType.STRING },
-  price: { label: "Цена", type: DataType.NUMBER },
+  name: { label: "Название", type: DataType.STRING, unit: null },
+  manufacturerName: {
+    label: "Производитель",
+    type: DataType.STRING,
+    unit: null,
+  },
+  supplierName: { label: "Поставщик", type: DataType.STRING, unit: null },
+  article: { label: "Артикул", type: DataType.STRING, unit: null },
+  model: { label: "Модель", type: DataType.STRING, unit: null },
+  externalCode: { label: "Код", type: DataType.STRING, unit: null },
+  price: { label: "Цена", type: DataType.NUMBER, unit: "₽" },
 } as const;
 
 export const SYSTEM_FIELD_KEYS = Object.keys(SYSTEM_FIELDS_CONFIG) as Array<

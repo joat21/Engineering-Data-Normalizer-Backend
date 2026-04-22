@@ -4,8 +4,6 @@ import cookieParser from "cookie-parser";
 import router from "./routes";
 import { errorHandler } from "./helpers/errorHandler";
 
-import "./services/ReferenceDataService/updateExchangeRates";
-
 const app = express();
 
 app.use(

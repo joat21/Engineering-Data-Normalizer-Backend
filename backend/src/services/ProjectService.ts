@@ -16,7 +16,9 @@ export const getProjectById = async (projectId: string) => {
     include: {
       items: {
         include: {
-          equipment: true,
+          equipment: {
+            include: { currency: true },
+          },
         },
         orderBy: { updatedAt: "desc" },
       },
@@ -27,20 +29,33 @@ export const getProjectById = async (projectId: string) => {
     throw ApiError.NotFound("Проект не найден");
   }
 
+  const currencies = await prisma.currency.findMany();
+  const exchangeRatesMap = new Map(
+    currencies.map((curr) => [curr.id, curr.rate]),
+  );
+
   return {
     ...project,
-    items: project.items.map((item) => ({
-      id: item.id,
-      equipmentId: item.equipmentId,
-      amount: item.amount,
-      name: item.equipment.name,
-      manufacturerName: item.equipment.manufacturerName,
-      supplierName: item.equipment.supplierName,
-      article: item.equipment.article,
-      model: item.equipment.model,
-      externalCode: item.equipment.externalCode,
-      price: item.equipment.price,
-    })),
+    items: project.items.map((item) => {
+      const equipment = item.equipment;
+
+      const rate = equipment.currencyId
+        ? exchangeRatesMap.get(equipment.currencyId)
+        : 1;
+
+      return {
+        id: item.id,
+        equipmentId: item.equipmentId,
+        amount: item.amount,
+        name: item.equipment.name,
+        manufacturerName: equipment.manufacturerName,
+        supplierName: equipment.supplierName,
+        article: equipment.article,
+        model: equipment.model,
+        externalCode: equipment.externalCode,
+        price: (Number(equipment.price) * Number(rate)).toFixed(2),
+      };
+    }),
   };
 };
 
