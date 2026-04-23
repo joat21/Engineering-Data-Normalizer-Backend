@@ -191,7 +191,7 @@ export const updateCategoryAttribute = async (
     updatedAttribute.categoryId,
     updatedAttribute,
     {
-      labelChanged: label !== updatedAttribute.label,
+      labelChanged: label !== existingAttribute.label,
       isFilterable: updatedAttribute.isFilterable,
     },
   );
