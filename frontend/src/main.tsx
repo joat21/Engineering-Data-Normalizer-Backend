@@ -10,12 +10,12 @@ import { I18nProvider, toast, Toast } from "@heroui/react";
 
 import "./index.css";
 import App from "./App.tsx";
+import axios from "axios";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
-      // refetchOnWindowFocus: false,
     },
   },
   mutationCache: new MutationCache({
@@ -32,15 +32,26 @@ const queryClient = new QueryClient({
       toast.success(message);
     },
 
-    onError: (_error, _variables, _onMutateResult, mutation) => {
+    onError: (error, _variables, _onMutateResult, mutation) => {
       const meta = mutation.meta;
 
+      // если явно передано false - не показываем тост
       if (meta?.errorMessage === false) return;
 
-      const message =
+      let errorMessage;
+
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data["message"];
+      } else {
+        errorMessage = error.message;
+      }
+
+      const metaErrorMessage =
         typeof meta?.errorMessage === "string"
           ? meta.errorMessage
           : "Произошла ошибка. Повторите попытку позже";
+
+      const message = errorMessage || metaErrorMessage;
 
       toast.danger(message);
     },
