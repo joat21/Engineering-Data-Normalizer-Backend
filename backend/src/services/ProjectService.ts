@@ -83,7 +83,7 @@ export const exportProjectToExcel = async (projectId: string) => {
     ...Object.entries(getSystemFields()).map(([key, cfg]) => {
       if (key === SYSTEM_FIELDS.PRICE) {
         return {
-          header: "Цена за ед.",
+          header: "Цена за ед. (ориг.)",
           key: key,
           width: 20,
         };
@@ -104,7 +104,7 @@ export const exportProjectToExcel = async (projectId: string) => {
       };
     }),
     { header: "Кол-во", key: "amount", width: 10 },
-    { header: "Итого", key: "total", width: 15 },
+    { header: "Стоимость (₽)", key: "total", width: 15 },
   ];
 
   worksheet.columns = columns;
@@ -112,7 +112,7 @@ export const exportProjectToExcel = async (projectId: string) => {
   let grandTotal = 0;
 
   project.items.forEach((item) => {
-    const itemPrice = Number(item.equipment.price || 0);
+    const itemPrice = Number(item.equipment.priceInRub || 0);
     const rowTotal = item.amount * itemPrice;
     grandTotal += rowTotal;
 
@@ -133,7 +133,7 @@ export const exportProjectToExcel = async (projectId: string) => {
   worksheet.addRow({});
   const totalRow = worksheet.addRow({
     [Object.keys(getSystemFields())[0]]: "ОБЩАЯ СТОИМОСТЬ ПРОЕКТА:",
-    total: grandTotal.toFixed(2),
+    total: grandTotal.toFixed(2) + " ₽",
   });
 
   const headerRow = worksheet.getRow(1);
