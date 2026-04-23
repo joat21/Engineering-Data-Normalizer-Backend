@@ -6,21 +6,28 @@ export const SYSTEM_FIELDS_CONFIG = {
   manufacturerName: {
     label: "Производитель",
     type: DataType.STRING,
+    excludeContexts: [FieldContext.IMPORT],
   },
-  supplierName: { label: "Поставщик", type: DataType.STRING },
+  supplierName: {
+    label: "Поставщик",
+    type: DataType.STRING,
+    excludeContexts: [FieldContext.IMPORT],
+  },
   article: { label: "Артикул", type: DataType.STRING },
   model: { label: "Модель", type: DataType.STRING },
   externalCode: { label: "Код", type: DataType.STRING },
   price: {
     label: "Цена (ориг.)",
     type: DataType.NUMBER,
-    contexts: [FieldContext.STAGING, FieldContext.AI],
+    contexts: [FieldContext.IMPORT, FieldContext.AI],
+    excludeContexts: [FieldContext.FTS],
   },
   priceInRub: {
     label: "Цена",
     type: DataType.NUMBER,
     unit: "₽",
     contexts: [FieldContext.FILTERS, FieldContext.COMPARISON],
+    excludeContexts: [FieldContext.FTS],
   },
 } as const satisfies Record<string, SystemFieldMetadata>;
 

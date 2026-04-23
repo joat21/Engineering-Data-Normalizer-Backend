@@ -71,11 +71,6 @@ export const getComparisonTable = async (userId: string) => {
 
   if (!comparison) return [];
 
-  const currencies = await prisma.currency.findMany();
-  const exchangeRatesMap = new Map(
-    currencies.map((curr) => [curr.id, curr.rate]),
-  );
-
   const groupedData = new Map<string, ComparisonGroup>();
 
   comparison.items.forEach((item) => {

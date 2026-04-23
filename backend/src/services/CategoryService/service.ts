@@ -1,8 +1,10 @@
+import slugify from "slugify";
 import {
   CreateCategoryAttributeBody,
   CreateCategoryAttributeParams,
   CreateCategoryBody,
   DataType,
+  FieldContext,
   getSystemFields,
   MappingTargetType,
   NormalizationOption,
@@ -12,9 +14,9 @@ import {
 import { prisma } from "../../prisma";
 import { getAttributeOptionsMap } from "../../helpers/getAttributeOptionsMap";
 import { booleanNormalizationOptions } from "../NormalizationService/config";
-import slugify from "slugify";
 import { handleUpdateCategoryFilter } from "./handleUpdateCategoryFilter";
 import { ApiError } from "../../exceptions/api-error";
+import { transformSystemFieldsToAttributes } from "./helpers";
 
 export const getCategories = async () => await prisma.category.findMany();
 
@@ -39,50 +41,14 @@ export const getCategoryAttributes = async (categoryId: string) => {
     orderBy: { label: "asc" },
   });
 
-  const [manufacturers, suppliers] = await Promise.all([
-    prisma.manufacturer.findMany({
-      orderBy: { name: "asc" },
-    }),
-    prisma.supplier.findMany({
-      orderBy: { name: "asc" },
-    }),
-  ]);
-
   const stringAttrIds = categoryAttributes
     .filter((attr) => attr.dataType === DataType.STRING)
     .map((attr) => attr.id);
 
   const optionsMap = await getAttributeOptionsMap(stringAttrIds);
 
-  const systemFields = Object.entries(getSystemFields()).map(
-    ([key, config]) => {
-      let options: NormalizationOption[] = [];
-
-      // костыльный костыль, таску на исправление себе уже записал
-      if (key === "manufacturerName")
-        options = manufacturers.map((m) => ({
-          id: m.id,
-          label: m.name,
-          normalized: { valueString: m.name },
-        }));
-      if (key === "supplierName")
-        options = suppliers.map((s) => ({
-          id: s.id,
-          label: s.name,
-          normalized: { valueString: s.name },
-        }));
-
-      return {
-        id: key,
-        key: key,
-        type: MappingTargetType.SYSTEM,
-        label: config.label,
-        unit: null,
-        dataType: config.type,
-        isFilterable: true,
-        options,
-      };
-    },
+  const systemFields = transformSystemFieldsToAttributes(
+    getSystemFields(FieldContext.IMPORT),
   );
 
   const attributes = categoryAttributes.map((attr) => {
@@ -118,18 +84,7 @@ export const getCategoryWithAttributes = async (categoryId: string) => {
     throw ApiError.NotFound("Категория не найдена");
   }
 
-  const systemFields = Object.entries(getSystemFields()).map(
-    ([key, config]) => ({
-      id: key,
-      key: key,
-      type: MappingTargetType.SYSTEM,
-      label: config.label,
-      unit: null,
-      dataType: config.type,
-      isFilterable: true,
-      options: [],
-    }),
-  );
+  const systemFields = transformSystemFieldsToAttributes(getSystemFields());
 
   // здесь мне не нужны options, поэтому пустой массив
   const attributes = category.attributes.map((attr) => ({

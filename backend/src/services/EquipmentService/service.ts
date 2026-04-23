@@ -279,11 +279,6 @@ export const getEquipmentTable = async (data: {
     }),
   ]);
 
-  const currencies = await prisma.currency.findMany();
-  const exchangeRatesMap = new Map(
-    currencies.map((curr) => [curr.id, curr.rate]),
-  );
-
   const headers: EquipmentHeader[] = [
     ...categoryFilters.map((f) => ({
       key: f.systemField || `attr_${f.attributeId}`,

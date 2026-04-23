@@ -70,11 +70,12 @@ export type PrevActionType =
   (typeof PrevActionType)[keyof typeof PrevActionType];
 
 export const FieldContext = {
-  STAGING: "staging", // Промежуточная таблица маппинга
+  IMPORT: "import", // Единичный и массовый импорты
   FILTERS: "filters", // Фильтры + таблица поиска
   FTS: "fts", // Полнотекстовый поиск
   COMPARISON: "comparison", // Сравнение
   AI: "ai", // Извлечение данных с помощью ИИ
+  CATEGORY_DIRECTORY: "category_directory", // справочник атрибутов категории
 } as const;
 
 export type FieldContext = (typeof FieldContext)[keyof typeof FieldContext];
@@ -86,7 +87,10 @@ export interface SystemFieldMetadata {
   type: DataType;
   unit?: string;
   contexts?: FieldContext[];
+  excludeContexts?: FieldContext[];
 }
+
+export type SystemFieldsConfig = Record<SystemFieldKey, SystemFieldMetadata>;
 
 export type MapColToAttrParams = z.infer<
   typeof mapColToAttrSchema.shape.params
