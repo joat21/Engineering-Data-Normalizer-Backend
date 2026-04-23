@@ -13,19 +13,22 @@ export type Project = z.infer<typeof projectBodySchema> & {
   isArchived: boolean;
 };
 
+export type ProjectItem = {
+  id: string;
+  equipmentId: string;
+  amount: number;
+  name: string | null;
+  manufacturerName: string | null;
+  supplierName: string | null;
+  article: string | null;
+  model: string | null;
+  externalCode: string | null;
+  price: string;
+  priceInRub: string;
+};
+
 export type ProjectDetails = Project & {
-  items: {
-    id: string;
-    equipmentId: string;
-    amount: number;
-    name: string | null;
-    manufacturerName: string | null;
-    supplierName: string | null;
-    article: string | null;
-    model: string | null;
-    externalCode: string | null;
-    price: string;
-  }[];
+  items: ProjectItem[];
 };
 
 export type CreateProjectBody = z.infer<typeof createProjectSchema.shape.body>;

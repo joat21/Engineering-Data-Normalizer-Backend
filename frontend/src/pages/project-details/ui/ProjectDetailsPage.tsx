@@ -19,7 +19,7 @@ export const ProjectDetailsPage = () => {
   const { name, description, isArchived, items } = project;
 
   const totalProjectPrice = project.items.reduce((acc, item) => {
-    const price = parseFloat(item.price || "0");
+    const price = parseFloat(item.priceInRub || "0");
     return acc + price * item.amount;
   }, 0);
 

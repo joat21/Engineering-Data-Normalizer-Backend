@@ -1,19 +1,9 @@
 import { Table } from "@heroui/react";
+import type { ProjectItem } from "@engineering-data-normalizer/shared";
 import { formatPrice } from "../model/utils";
 
 interface EquipmentTableProps {
-  items: {
-    id: string;
-    equipmentId: string;
-    amount: number;
-    name: string | null;
-    manufacturerName: string | null;
-    supplierName: string | null;
-    article: string | null;
-    model: string | null;
-    externalCode: string | null;
-    price: string;
-  }[];
+  items: ProjectItem[];
 }
 
 export const EquipmentTable = ({ items }: EquipmentTableProps) => {
@@ -29,15 +19,21 @@ export const EquipmentTable = ({ items }: EquipmentTableProps) => {
               <Table.Column>Модель</Table.Column>
               <Table.Column>Артикул</Table.Column>
               <Table.Column>Код</Table.Column>
-              <Table.Column className="text-right">Цена за ед.</Table.Column>
+              <Table.Column className="text-right">
+                Цена за ед. (ориг.)
+              </Table.Column>
+              <Table.Column className="text-right">
+                Цена за ед. (₽)
+              </Table.Column>
               <Table.Column className="text-center">Кол-во</Table.Column>
-              <Table.Column className="text-right">Стоимость</Table.Column>
+              <Table.Column className="text-right">Стоимость (₽)</Table.Column>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {items.map((item) => {
               const unitPrice = parseFloat(item.price || "0");
-              const totalPrice = unitPrice * item.amount;
+              const unitPriceInRub = parseFloat(item.priceInRub || "0");
+              const totalPriceInRub = unitPriceInRub * item.amount;
 
               return (
                 <Table.Row key={item.id}>
@@ -52,9 +48,12 @@ export const EquipmentTable = ({ items }: EquipmentTableProps) => {
                   <Table.Cell className="text-right">
                     {formatPrice(unitPrice)}
                   </Table.Cell>
+                  <Table.Cell className="text-right">
+                    {formatPrice(unitPriceInRub)}
+                  </Table.Cell>
                   <Table.Cell className="text-center">{item.amount}</Table.Cell>
                   <Table.Cell className="text-right">
-                    {formatPrice(totalPrice)}
+                    {formatPrice(totalPriceInRub)}
                   </Table.Cell>
                 </Table.Row>
               );

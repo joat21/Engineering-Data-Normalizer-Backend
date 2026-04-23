@@ -30,13 +30,13 @@ export const downloadExcel = async (projectId: string, projectName: string) => {
 };
 
 export const formatPrice = (price: string | number | null) => {
-  if (!price) return "0 ₽";
+  if (!price) return "0";
 
   const num = typeof price === "string" ? parseFloat(price) : price;
 
   return new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
+    style: "decimal",
     minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(num);
 };

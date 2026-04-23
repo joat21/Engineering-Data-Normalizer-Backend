@@ -26,7 +26,7 @@ export const Footer = ({
       <div className="flex gap-4 items-baseline">
         <span className="text-lg">Общая стоимость проекта:</span>
         <span className="text-2xl font-bold text-accent">
-          {formatPrice(totalProjectPrice)}
+          {formatPrice(totalProjectPrice)} ₽
         </span>
       </div>
     </div>
