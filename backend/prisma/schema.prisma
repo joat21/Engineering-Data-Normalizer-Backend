@@ -59,6 +59,9 @@ model Equipment {
   supplierId       String?                   @db.Uuid
   currency         Currency?                 @relation(fields: [currencyId], references: [id])
   currencyId       String?                   @db.Uuid
+  search_vector    Unsupported("tsvector")?  @default(dbgenerated())
+
+  @@index([search_vector], name: "equipment_search_idx", type: Gin)
 }
 
 model EquipmentAttributeValue {
