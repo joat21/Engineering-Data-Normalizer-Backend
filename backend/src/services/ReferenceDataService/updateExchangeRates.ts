@@ -1,5 +1,4 @@
 import axios from "axios";
-import cron from "node-cron";
 import { prisma } from "../../prisma";
 
 interface ExchangeRatesResponse {
@@ -12,12 +11,15 @@ interface ExchangeRatesResponse {
   >;
 }
 
-export const updateRates = async () => {
+export const updateExchangeRates = async () => {
   try {
-    console.log("[LOG]: Updating exchange rates started");
+    console.log(
+      `[${new Date().toISOString()}] [LOG]: Updating exchange rates started`,
+    );
+    const startTime = Date.now();
 
     const { data } = await axios.get<ExchangeRatesResponse>(
-      "https://www.cbr-xml-daily.ru/daily_json.js",
+      process.env.EXCHANGE_RATES_URL ?? "",
     );
 
     const existingCurrencies = await prisma.currency.findMany({
@@ -42,15 +44,12 @@ export const updateRates = async () => {
 
     if (updates.length > 0) {
       await prisma.$transaction(updates as any);
-      console.log(`[LOG]: Successfully updated ${updates.length} currencies`);
+      const duration = Date.now() - startTime;
+      console.log(
+        `[${new Date().toISOString()}] [LOG]: Successfully updated ${updates.length} currencies in ${duration}ms`,
+      );
     }
   } catch (error) {
     console.error("[Error]: Failed to update exchange rates:", error);
   }
-};
-
-export const initCurrencyCron = () => {
-  cron.schedule("0 5 * * *", updateRates, {
-    timezone: "Asia/Yekaterinburg",
-  });
 };

@@ -1,9 +1,6 @@
 import "dotenv/config";
 import app from "./app";
-import {
-  initCurrencyCron,
-  updateRates,
-} from "./services/ReferenceDataService/updateExchangeRates";
+import { initPricesUpdate, updatePrices } from "./tasks/catalogUpdate";
 
 const PORT = Number(process.env.PORT) || 8080;
 
@@ -12,9 +9,9 @@ app.listen(PORT, "0.0.0.0", async (error) => {
     return console.error(error);
   }
 
-  initCurrencyCron();
+  initPricesUpdate();
   // TODO: не забыть раскомментировать перед билдом
-  // await updateRates();
+  // await updatePrices();
 
   console.log(`[Server]: Server listening at http://localhost:${PORT}`);
 });

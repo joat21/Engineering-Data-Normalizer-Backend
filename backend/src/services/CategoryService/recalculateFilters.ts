@@ -120,3 +120,43 @@ export const recalculateFilters = async (categoryId: string) => {
     prisma.categoryFilter.createMany({ data: filterEntries }),
   ]);
 };
+
+export const recalculateAllCategoryFilters = async () => {
+  console.log(
+    `[${new Date().toISOString()}] [LOG]: Starting global filters recalculation`,
+  );
+  const startTime = Date.now();
+
+  try {
+    const categories = await prisma.category.findMany({
+      select: { id: true, name: true },
+    });
+
+    console.log(`[LOG]: Found ${categories.length} categories to process`);
+
+    for (const category of categories) {
+      const catStartTime = Date.now();
+      try {
+        await recalculateFilters(category.id);
+        console.log(
+          `[LOG]: Filters for "${category.name}" updated in ${Date.now() - catStartTime}ms`,
+        );
+      } catch (err) {
+        console.error(
+          `[Error]: Failed to recalculate filters for category ${category.name}:`,
+          err,
+        );
+      }
+    }
+
+    const duration = Date.now() - startTime;
+    console.log(
+      `[${new Date().toISOString()}] [LOG]: Global filters recalculation finished in ${duration}ms`,
+    );
+  } catch (error) {
+    console.error(
+      `[Error]: Critical failure in recalculateAllCategoryFilters:`,
+      error,
+    );
+  }
+};
