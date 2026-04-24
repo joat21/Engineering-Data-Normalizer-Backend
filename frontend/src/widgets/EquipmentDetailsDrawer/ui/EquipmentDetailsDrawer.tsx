@@ -26,10 +26,10 @@ export const EquipmentDetailsDrawer = ({
   if (isFetching) return <PageLoader />;
 
   return (
-    <Drawer.Backdrop isOpen={isOpen}>
+    <Drawer.Backdrop isOpen={isOpen} onOpenChange={onClose}>
       <Drawer.Content placement="right">
         <Drawer.Dialog className="max-w-[30vw] w-full">
-          <Drawer.CloseTrigger onPress={onClose} />
+          <Drawer.CloseTrigger />
           <Drawer.Header>
             <Drawer.Heading className="text-xl">
               Информация об оборудовании

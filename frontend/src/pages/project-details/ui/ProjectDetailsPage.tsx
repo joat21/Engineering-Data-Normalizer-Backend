@@ -67,11 +67,7 @@ export const ProjectDetailsPage = () => {
         </div>
       </div>
 
-      <EditProjectModal
-        project={project}
-        onClose={editModal.close}
-        isOpen={editModal.isOpen}
-      />
+      <EditProjectModal project={project} state={editModal} />
     </>
   );
 };

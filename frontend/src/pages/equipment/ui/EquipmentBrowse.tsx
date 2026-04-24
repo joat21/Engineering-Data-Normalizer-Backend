@@ -37,6 +37,9 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
   const { query, updateQuery } = useEquipmentTableQuery();
 
   const [selectedEquipmentId, setSelectedEquipmentId] = useState<string | null>(
+    null,
+  );
+  const [equipmentDetailsId, setEquipmentDetailsId] = useState<string | null>(
     query.details ?? null,
   );
 
@@ -65,7 +68,7 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
 
   const handleViewDetails = useCallback(
     (equipmentId: string) => {
-      setSelectedEquipmentId(equipmentId);
+      setEquipmentDetailsId(equipmentId);
       updateQuery({
         ...query,
         details: equipmentId,
@@ -80,7 +83,7 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
       ...query,
       details: undefined,
     });
-    setSelectedEquipmentId(null);
+    setEquipmentDetailsId(null);
     equipmentDetailsDrawer.close();
   }, [equipmentDetailsDrawer.close, updateQuery]);
 
@@ -189,8 +192,8 @@ export const EquipmentBrowse = ({ categoryId }: EquipmentBrowseProps) => {
       />
 
       <EquipmentDetailsDrawer
-        equipmentId={selectedEquipmentId}
-        isOpen={equipmentDetailsDrawer.isOpen || selectedEquipmentId !== null}
+        equipmentId={equipmentDetailsId}
+        isOpen={equipmentDetailsDrawer.isOpen || equipmentDetailsId !== null}
         onClose={handleCloseDetails}
         onAddToProject={handleAddToProject}
         onCompare={handleAddToComparison}

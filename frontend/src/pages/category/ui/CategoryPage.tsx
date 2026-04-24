@@ -93,14 +93,12 @@ export const CategoryPage = () => {
 
       <CreateCategoryAttributeModal
         categoryId={id}
-        isOpen={createCategoryAttributeModal.isOpen}
-        onClose={createCategoryAttributeModal.close}
+        state={createCategoryAttributeModal}
       />
 
       <EditCategoryAttributeModal
         attribute={selectedAttr}
-        isOpen={editCategoryAttributeModal.isOpen}
-        onClose={editCategoryAttributeModal.close}
+        state={editCategoryAttributeModal}
       />
     </>
   );
