@@ -9,7 +9,6 @@ import { applyTransform } from "./transformation/transformers";
 import { NormalizeSingleEntity } from "./types";
 import { prisma } from "../../prisma";
 import { getRawValue } from "../../helpers/getRawValue";
-import { createEquipment } from "../EquipmentService/service";
 import { buildSingleNormalizationContext } from "./normalization/context";
 import { executeUpdatePipeline } from "./transformation/executeUpdatePipeline";
 import { cleanValue } from "../../helpers/cleanValue";

@@ -27,20 +27,21 @@ const normalizeNumeric = (
   // Сплит по разделителям размерности,
   // чтобы отдельно обрабатывать части строк вида '1.25"x2"'
   const parts = rawValue
-    .toLowerCase()
     .split(DIMENSION_SEPARATORS_REGEX)
     .filter((p) => p.length > 0);
 
   // возврат массива,
   // чтобы не потерять части составных значений (например, если 1.25" из 1.25"x2" нормализовать не удалось)
   return parts.map((part) => {
-    const partClean = part.trim();
+    // сохраняем отдельно исходную строку, чтобы вернуть ее без lowerCase
+    const trimmedPart = part.trim();
+    const partClean = trimmedPart.toLowerCase();
     const partKey = `${attributeId}:${partClean}`;
 
     if (isSimpleNumeric(partClean)) {
       const nums = parseNumbers(partClean);
       return {
-        valueString: partClean,
+        valueString: trimmedPart,
         valueMin: nums.length > 0 ? Math.min(...nums) : undefined,
         valueMax: nums.length > 0 ? Math.max(...nums) : undefined,
         valueArray: nums.length >= 3 ? nums : undefined,
@@ -50,7 +51,7 @@ const normalizeNumeric = (
     if (cacheMap.has(partKey)) {
       const cached = cacheMap.get(partKey) as unknown as NormalizedValue;
       return {
-        valueString: partClean,
+        valueString: trimmedPart,
         valueMin: cached.valueMin,
         valueMax: cached.valueMax,
         valueArray: cached.valueArray,
@@ -58,7 +59,7 @@ const normalizeNumeric = (
     }
 
     return {
-      valueString: partClean,
+      valueString: trimmedPart,
       needsCheck: true,
     } as UnnormalizedValue;
   });
