@@ -50,13 +50,17 @@ export const HeaderColumn = memo(
 
     return (
       <div className="flex flex-col gap-2 p-3 min-w-55">
-        <Label className="text-base font-bold truncate">{col.label}</Label>
+        <Label className="text-base font-bold truncate">
+          {col.label} {col.unit && `(${col.unit})`}
+        </Label>
         <div className="flex items-center gap-1">
           <AppSelect
             className="flex-1"
             items={attributes}
             getItemKey={(attr) => attr.id}
-            getItemLabel={(attr) => attr.label}
+            getItemLabel={(attr) =>
+              attr.unit ? `${attr.label} (${attr.unit})` : attr.label
+            }
             aria-label="Атрибуты"
             isPending={isAttributesPending}
             placeholder="Атрибут"

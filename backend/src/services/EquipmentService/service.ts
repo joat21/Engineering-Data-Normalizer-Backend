@@ -22,7 +22,6 @@ import { TransformedRow } from "../NormalizationService/types";
 import { recalculateFilters } from "../CategoryService/recalculateFilters";
 import { EquipmentSystemFields, ImportSessionStatus } from "../../types";
 import { ApiError } from "../../exceptions/api-error";
-import { SYSTEM_FIELDS } from "../../config";
 
 const LIMIT = 20;
 

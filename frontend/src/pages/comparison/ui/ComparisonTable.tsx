@@ -57,7 +57,7 @@ export const ComparisonTable = ({
                 )}
               >
                 <td className="sticky left-0 p-4 font-medium bg-white border-r z-10">
-                  {field.label}
+                  {field.label} {field.unit && `(${field.unit})`}
                 </td>
 
                 {activeCategory.items.map((item) => {

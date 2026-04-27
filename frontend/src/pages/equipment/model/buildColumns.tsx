@@ -16,7 +16,7 @@ export const buildColumns = (
     (header) => ({
       id: header.key,
       accessorKey: header.key,
-      header: header.label,
+      header: header.unit ? `${header.label} (${header.unit})` : header.label,
       cell: (info) => {
         const value = info.getValue();
         return value !== null && value !== undefined ? String(value) : "—";

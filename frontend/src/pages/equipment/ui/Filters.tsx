@@ -64,7 +64,7 @@ export const Filters = memo(({ filters }: FiltersProps) => {
                 <Accordion.Heading className="items-center pl-3">
                   <Accordion.Indicator />
                   <Accordion.Trigger className="text-base font-semibold">
-                    {filter.label}
+                    {filter.label} {filter.unit && `(${filter.unit})`}
                   </Accordion.Trigger>
                 </Accordion.Heading>
                 <Accordion.Panel className="px-4">

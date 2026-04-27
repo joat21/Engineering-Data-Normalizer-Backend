@@ -29,10 +29,21 @@ export const downloadExcel = async (projectId: string, projectName: string) => {
   }
 };
 
-export const formatPrice = (price: string | number | null) => {
+export const formatPrice = (
+  price: string | number | null,
+  currencyCode?: string,
+) => {
   if (!price) return "0";
 
   const num = typeof price === "string" ? parseFloat(price) : price;
+
+  if (currencyCode) {
+    return new Intl.NumberFormat("ru-RU", {
+      style: "currency",
+      currency: currencyCode,
+      minimumFractionDigits: 0,
+    }).format(num);
+  }
 
   return new Intl.NumberFormat("ru-RU", {
     style: "decimal",

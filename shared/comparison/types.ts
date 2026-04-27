@@ -12,6 +12,7 @@ export type RemoveFromComparisonParams = z.infer<
 export interface ComparisonField {
   key: string;
   label: string;
+  unit?: string | null;
 }
 
 export interface ComparisonItem {

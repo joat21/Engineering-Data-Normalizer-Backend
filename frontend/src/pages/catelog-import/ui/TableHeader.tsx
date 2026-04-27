@@ -1,4 +1,5 @@
-import { Checkbox, type Key } from "@heroui/react";
+import { useCallback } from "react";
+import { type Key } from "@heroui/react";
 import {
   MappingTargetType,
   PrevActionType,
@@ -11,9 +12,8 @@ import {
   useSelectionStore,
   useTransformationContextStore,
 } from "../model/store";
-import { useMappingMutation } from "@/features/import";
 import { TransformationType } from "../model/types";
-import { useCallback } from "react";
+import { useMappingMutation } from "@/features/import";
 
 interface TableHeaderProps {
   columns: StagingColumn[];
@@ -92,15 +92,7 @@ export const TableHeader = ({
   return (
     <thead className="sticky top-0 z-20 shadow-sm">
       <tr className="bg-gray-300">
-        {isSelecting && (
-          <th className="p-3">
-            <Checkbox aria-label="Выбрать все" slot="selection">
-              <Checkbox.Control>
-                <Checkbox.Indicator />
-              </Checkbox.Control>
-            </Checkbox>
-          </th>
-        )}
+        {isSelecting && <th className="p-3" />}
         {columns.map((col) => (
           <th key={col.id}>
             <HeaderColumn

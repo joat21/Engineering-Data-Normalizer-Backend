@@ -38,7 +38,9 @@ export const Mapping = ({
             <AppSelect
               items={attributes}
               getItemKey={(attr) => attr.id}
-              getItemLabel={(attr) => attr.label}
+              getItemLabel={(attr) =>
+                attr.unit ? `${attr.label} (${attr.unit})` : attr.label
+              }
               variant="secondary"
               className="w-full"
               aria-label={`Атрибут для значения ${value}`}

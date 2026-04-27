@@ -46,7 +46,7 @@ export const EquipmentTable = ({ items }: EquipmentTableProps) => {
                   <Table.Cell>{item.article || "—"}</Table.Cell>
                   <Table.Cell>{item.externalCode || "—"}</Table.Cell>
                   <Table.Cell className="text-right">
-                    {formatPrice(unitPrice)}
+                    {formatPrice(unitPrice, item.currencyCode)}
                   </Table.Cell>
                   <Table.Cell className="text-right">
                     {formatPrice(unitPriceInRub)}
