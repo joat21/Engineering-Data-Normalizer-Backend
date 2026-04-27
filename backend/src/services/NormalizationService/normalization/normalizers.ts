@@ -4,6 +4,7 @@ import {
   NormalizedValue,
   parseNumbers,
 } from "@engineering-data-normalizer/shared";
+import { DEFAULT_BOOLEAN_VALUES } from "../config";
 import { UnnormalizedValue } from "../types";
 import { DIMENSION_SEPARATORS_REGEX } from "../../../config";
 import { isSimpleNumeric } from "../../../helpers/isSimpleNumeric";
@@ -14,10 +15,23 @@ export const normalizeValue = (
   type: DataType,
   attributeId: string,
   cacheMap: Map<string, JsonValue>,
-): Array<NormalizedValue | UnnormalizedValue> =>
-  type === DataType.NUMBER
-    ? normalizeNumeric(rawValue, attributeId, cacheMap)
-    : [normalizeStringOrBoolean(rawValue, attributeId, cacheMap)];
+): Array<NormalizedValue | UnnormalizedValue> => {
+  switch (type) {
+    case DataType.STRING:
+      return [normalizeString(rawValue, attributeId, cacheMap)];
+
+    case DataType.NUMBER:
+      return normalizeNumeric(rawValue, attributeId, cacheMap);
+
+    case DataType.BOOLEAN:
+      return [normalizeBoolean(rawValue, attributeId, cacheMap)];
+
+    default: {
+      const _exhaustive: never = type;
+      return _exhaustive;
+    }
+  }
+};
 
 const normalizeNumeric = (
   rawValue: string,
@@ -65,7 +79,7 @@ const normalizeNumeric = (
   });
 };
 
-const normalizeStringOrBoolean = (
+const normalizeString = (
   rawValue: string,
   attributeId: string,
   cacheMap: Map<string, JsonValue>,
@@ -75,9 +89,35 @@ const normalizeStringOrBoolean = (
   const cached = cacheMap.get(key);
 
   return cached
-    ? (cached as unknown as NormalizedValue)
+    ? (cached as NormalizedValue)
     : {
         valueString: rawValue.trim(),
         needsCheck: true,
       };
+};
+
+const normalizeBoolean = (
+  rawValue: string,
+  attributeId: string,
+  cacheMap: Map<string, JsonValue>,
+): NormalizedValue | UnnormalizedValue => {
+  const cleaned = cleanValue(rawValue);
+  const key = `${attributeId}:${cleaned}`;
+
+  const cached = cacheMap.get(key);
+  if (cached) {
+    return cached as NormalizedValue;
+  }
+
+  if (Object.hasOwn(DEFAULT_BOOLEAN_VALUES, cleaned)) {
+    return {
+      valueString: rawValue.trim(),
+      valueBoolean: DEFAULT_BOOLEAN_VALUES[cleaned],
+    };
+  }
+
+  return {
+    valueString: rawValue.trim(),
+    needsCheck: true,
+  };
 };

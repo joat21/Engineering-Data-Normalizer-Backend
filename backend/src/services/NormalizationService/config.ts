@@ -12,3 +12,20 @@ export const booleanNormalizationOptions = [
     normalized: { valueBoolean: false, valueString: "Нет" },
   },
 ];
+
+export const DEFAULT_BOOLEAN_VALUES: Record<string, boolean> = {
+  да: true,
+  yes: true,
+  true: true,
+  "1": true,
+  есть: true,
+  "+": true,
+  вкл: true,
+
+  нет: false,
+  no: false,
+  false: false,
+  "0": false,
+  "-": false,
+  выкл: false,
+};
