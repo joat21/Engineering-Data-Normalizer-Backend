@@ -54,6 +54,7 @@ export interface CategoryAttribute {
 export interface CategoryFilter {
   key: string;
   label: string;
+  unit?: string | null;
   type: DataType;
   min: number | null;
   max: number | null;

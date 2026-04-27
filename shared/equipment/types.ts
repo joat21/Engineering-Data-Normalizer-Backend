@@ -27,6 +27,7 @@ export type FilterValue = z.infer<typeof filterValueSchema>;
 export interface EquipmentHeader {
   key: string;
   label: string;
+  unit?: string | null;
   type: MappingTargetType;
 }
 

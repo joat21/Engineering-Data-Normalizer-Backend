@@ -111,6 +111,7 @@ model CategoryFilter {
   attributeId String?            @db.Uuid
   systemField String?
   label       String
+  unit        String?
   type        DataType
   minValue    Decimal?           @db.Decimal(12, 2)
   maxValue    Decimal?           @db.Decimal(12, 2)

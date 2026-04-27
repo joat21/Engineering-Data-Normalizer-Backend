@@ -52,6 +52,7 @@ export const handleUpdateCategoryFilter = async (
     attribute: { connect: { id: attribute.id } },
     label: attribute.label,
     type: attribute.dataType,
+    unit: attribute.unit,
   };
 
   if (attribute.dataType === DataType.NUMBER) {

@@ -283,6 +283,7 @@ export const getEquipmentTable = async (data: {
     ...categoryFilters.map((f) => ({
       key: f.systemField || `attr_${f.attributeId}`,
       label: f.label,
+      unit: f.unit,
       type: f.systemField
         ? MappingTargetType.SYSTEM
         : MappingTargetType.ATTRIBUTE,

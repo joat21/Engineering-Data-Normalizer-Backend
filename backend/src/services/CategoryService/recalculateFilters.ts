@@ -22,6 +22,12 @@ export const recalculateFilters = async (categoryId: string) => {
     Object.entries(getSystemFields(FieldContext.FILTERS)).map(
       async ([field, config]) => {
         const systemField = field as keyof EquipmentSystemFields;
+        const baseFilter = {
+          categoryId,
+          systemField,
+          label: config.label,
+          unit: config.unit,
+        };
 
         if (config.type === DataType.NUMBER) {
           const agg = await prisma.equipment.aggregate({
@@ -31,9 +37,7 @@ export const recalculateFilters = async (categoryId: string) => {
           });
 
           return {
-            categoryId,
-            systemField,
-            label: config.label,
+            ...baseFilter,
             type: DataType.NUMBER,
             minValue: agg._min[systemField],
             maxValue: agg._max[systemField],
@@ -48,9 +52,7 @@ export const recalculateFilters = async (categoryId: string) => {
         });
 
         return {
-          categoryId,
-          systemField: field,
-          label: config.label,
+          ...baseFilter,
           type: DataType.STRING,
           options: groups.map((g) => g[systemField]).filter((v) => v !== null),
         };
@@ -68,6 +70,7 @@ export const recalculateFilters = async (categoryId: string) => {
         attributeId: attr.id,
         label: attr.label,
         type: attr.dataType,
+        unit: attr.unit,
       };
 
       if (attr.dataType === DataType.NUMBER) {
