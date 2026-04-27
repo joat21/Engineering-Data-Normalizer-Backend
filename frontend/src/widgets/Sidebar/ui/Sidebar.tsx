@@ -1,4 +1,3 @@
-import { type FC } from "react";
 import { Button, cn } from "@heroui/react";
 import {
   Home,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { MenuItem } from "./MenuItem";
 import type { SidebarMenuItem } from "../model/types";
+import { useLocalStorage } from "@/shared/lib/useLocalStorage";
 
 const items: SidebarMenuItem[] = [
   { label: "Главная", icon: Home, path: "/" },
@@ -22,34 +22,34 @@ const items: SidebarMenuItem[] = [
   { label: "Проекты", icon: FolderKanban, path: "/projects" },
 ];
 
-interface SidebarProps {
-  collapsed: boolean;
-  setCollapsed: (collpased: boolean) => void;
-}
+export const Sidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useLocalStorage(
+    "sidebar-collapsed",
+    false,
+  );
 
-export const Sidebar: FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   return (
     <aside
       className={cn(
         "sticky top-0 flex flex-col max-w-75 w-full max-h-screen border-r border-default-200 bg-white/50 transition-all duration-400",
-        collapsed && "max-w-16",
+        isCollapsed && "max-w-16",
       )}
     >
       <div className="mb-20 px-4 pt-4">
         <Button
           size="sm"
           variant="outline"
-          onPress={() => setCollapsed(!collapsed)}
+          onPress={() => setIsCollapsed((prev) => !prev)}
           isIconOnly
         >
-          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
         </Button>
       </div>
       <div className="flex flex-col justify-between mb-12 px-5 pt-4">
         <div
           className={cn(
             "max-w-full opacity-100 overflow-hidden whitespace-nowrap transition-all duration-400",
-            collapsed && "max-w-0 opacity-0",
+            isCollapsed && "max-w-0 opacity-0",
           )}
         >
           <p className="mb-1 text-[22px] font-semibold">
@@ -61,7 +61,7 @@ export const Sidebar: FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
 
       <nav className="flex flex-col gap-1 px-2">
         {items.map((item) => (
-          <MenuItem key={item.label} item={item} collapsed={collapsed} />
+          <MenuItem key={item.label} item={item} collapsed={isCollapsed} />
         ))}
       </nav>
     </aside>
