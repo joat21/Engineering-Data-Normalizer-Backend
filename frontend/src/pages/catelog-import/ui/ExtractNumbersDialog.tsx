@@ -39,11 +39,17 @@ export const ExtractNumbersDialog = ({
   const handleSelectAttribute = (value: Key | null, index: number) => {
     if (!value) return;
 
+    const selectedAttr = attributes.find((attr) => attr.id === String(value));
+    if (!selectedAttr) return;
+
     const newTargets = targets;
-    newTargets[index] = {
-      type: MappingTargetType.ATTRIBUTE,
-      id: String(value),
-    };
+    newTargets[index] =
+      selectedAttr.type === MappingTargetType.ATTRIBUTE
+        ? {
+            type: selectedAttr.type,
+            id: String(value),
+          }
+        : { type: selectedAttr.type, field: selectedAttr.id as any };
 
     setTargets(newTargets);
   };
