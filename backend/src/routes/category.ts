@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createCategoryAttributeSchema,
   createCategorySchema,
-  getCategoryAttributesSchema,
+  getAttributesForImportSchema,
   getCategoryFiltersSchema,
   getCategoryWithAttributesSchema,
   updateCategoryAttributeSchema,
@@ -21,9 +21,9 @@ router.get(
 );
 
 router.get(
-  "/:id/attributes",
-  validate(getCategoryAttributesSchema),
-  CategoryController.getCategoryAttributesHandler,
+  "/:importSessionId/attributes",
+  validate(getAttributesForImportSchema),
+  CategoryController.getAttributesForImportHandler,
 );
 
 router.get(

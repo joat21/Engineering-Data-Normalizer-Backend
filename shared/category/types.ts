@@ -2,7 +2,7 @@ import type z from "zod";
 import type {
   createCategoryAttributeSchema,
   createCategorySchema,
-  getCategoryAttributesSchema,
+  getAttributesForImportSchema,
   getCategoryFiltersSchema,
   getCategoryWithAttributesSchema,
   updateCategoryAttributeSchema,
@@ -64,8 +64,8 @@ export interface CategoryFilter {
 export type GetCategoryFiltersParams = z.infer<
   typeof getCategoryFiltersSchema.shape.params
 >;
-export type GetCategoryAttributesParams = z.infer<
-  typeof getCategoryAttributesSchema.shape.params
+export type GetAttributesForImportParams = z.infer<
+  typeof getAttributesForImportSchema.shape.params
 >;
 
 export type GetCategoryWithAttributesParams = z.infer<

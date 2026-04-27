@@ -7,9 +7,9 @@ export const getCategoryFiltersSchema = z.object({
   }),
 });
 
-export const getCategoryAttributesSchema = z.object({
+export const getAttributesForImportSchema = z.object({
   params: z.object({
-    id: z.uuid(),
+    importSessionId: z.uuid(),
   }),
 });
 

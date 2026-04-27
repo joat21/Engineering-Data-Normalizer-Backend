@@ -19,6 +19,7 @@ import {
   getExistingAttributeLabel,
   transformSystemFieldsToAttributes,
 } from "./helpers";
+import { SYSTEM_FIELDS } from "../../config";
 
 export const getCategories = async () => await prisma.category.findMany();
 
@@ -38,7 +39,18 @@ export const getCategoryFilters = async (categoryId: string) => {
   }));
 };
 
-export const getCategoryAttributes = async (categoryId: string) => {
+export const getAttributesForImport = async (importSessionId: string) => {
+  const session = await prisma.importSession.findUnique({
+    where: { id: importSessionId },
+    select: { categoryId: true, currency: true },
+  });
+
+  if (!session) {
+    throw ApiError.NotFound("Сессия импорта не найдена");
+  }
+
+  const { categoryId, currency } = session;
+
   const categoryAttributes = await prisma.categoryAttribute.findMany({
     where: { categoryId },
     orderBy: { label: "asc" },
@@ -52,7 +64,10 @@ export const getCategoryAttributes = async (categoryId: string) => {
 
   const systemFields = transformSystemFieldsToAttributes(
     getSystemFields(FieldContext.IMPORT),
-  );
+  ).map((field) => ({
+    ...field,
+    unit: field.key === SYSTEM_FIELDS.PRICE ? currency?.symbol : field.unit,
+  }));
 
   const attributes = categoryAttributes.map((attr) => {
     const { categoryId, ...rest } = attr;

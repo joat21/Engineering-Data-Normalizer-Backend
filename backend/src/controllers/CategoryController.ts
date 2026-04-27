@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import {
   createCategoryAttributeSchema,
   createCategorySchema,
-  getCategoryAttributesSchema,
+  getAttributesForImportSchema,
   getCategoryFiltersSchema,
   getCategoryWithAttributesSchema,
   updateCategoryAttributeSchema,
@@ -11,8 +11,8 @@ import { HandlerFromSchema } from "../types/zod";
 import {
   createCategory,
   createCategoryAttribute,
+  getAttributesForImport,
   getCategories,
-  getCategoryAttributes,
   getCategoryFilters,
   getCategoryWithAttributes,
   updateCategoryAttribute,
@@ -39,11 +39,11 @@ export const getCategoryFiltersHandler: HandlerFromSchema<
   }
 };
 
-export const getCategoryAttributesHandler: HandlerFromSchema<
-  typeof getCategoryAttributesSchema
+export const getAttributesForImportHandler: HandlerFromSchema<
+  typeof getAttributesForImportSchema
 > = async (req, res, next) => {
   try {
-    const attributes = await getCategoryAttributes(req.params.id);
+    const attributes = await getAttributesForImport(req.params.importSessionId);
 
     res.json(attributes);
   } catch (error) {
