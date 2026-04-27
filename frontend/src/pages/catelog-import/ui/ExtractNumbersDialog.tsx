@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Modal, type Key } from "@heroui/react";
+import { Button, Modal, toast, type Key } from "@heroui/react";
 import { Hash } from "lucide-react";
 import {
   MappingTargetType,
@@ -55,6 +55,11 @@ export const ExtractNumbersDialog = ({
   };
 
   const handleApply = () => {
+    const notNullTargets = targets.filter((t) => t != null);
+    if (notNullTargets.length === 0) {
+      return toast.danger("Выберите хотя бы один атрибут");
+    }
+
     const payload = {
       sessionId,
       colIndex: column.originIndex,

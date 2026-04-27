@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input, Label, Modal, type Key } from "@heroui/react";
+import { Button, Input, Label, Modal, toast, type Key } from "@heroui/react";
 import { Scissors } from "lucide-react";
 import {
   MappingTargetType,
@@ -65,7 +65,14 @@ export const SplitByDialog = ({
   };
 
   const handleApply = () => {
-    if (!selectedSeparator) return;
+    if (!selectedSeparator) {
+      return toast.danger("Выберите разделитель");
+    }
+
+    const notNullTargets = targets.filter((t) => t != null);
+    if (notNullTargets.length === 0) {
+      return toast.danger("Выберите хотя бы один атрибут");
+    }
 
     const payload = {
       sessionId,
@@ -77,6 +84,8 @@ export const SplitByDialog = ({
       },
       targets: targets,
     };
+
+    console.log(payload);
 
     applyTransformMutation.mutate(payload, {
       onSuccess: (data, variables) => {

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Checkbox, Chip, cn, Input, Modal } from "@heroui/react";
+import { Button, Checkbox, Chip, cn, Input, Modal, toast } from "@heroui/react";
 import {
   AlertCircle,
   Check,
@@ -86,6 +86,11 @@ export const AIParseDialog = ({
       .filter((attr) => selectedAttrIds.includes(attr.id))
       .map((attr) => ({ type: attr.type, key: attr.key, label: attr.label }));
 
+    const notNullTargets = targets.filter((t) => t != null);
+    if (notNullTargets.length === 0) {
+      return toast.danger("Выберите хотя бы один атрибут");
+    }
+
     const payload = {
       importSessionId: sessionId,
       colIndex: column.originIndex,
@@ -109,6 +114,11 @@ export const AIParseDialog = ({
     const targets = attributes
       .filter((attr) => selectedAttrIds.includes(attr.id))
       .map((attr) => ({ type: attr.type, key: attr.key, label: attr.label }));
+
+    const notNullTargets = targets.filter((t) => t != null);
+    if (notNullTargets.length === 0) {
+      return toast.danger("Выберите хотя бы один атрибут");
+    }
 
     const payload = {
       importSessionId: sessionId,
