@@ -8,6 +8,7 @@ import categoryRoutes from "./category";
 import projectRoutes from "./project";
 import comparisonRoutes from "./comparison";
 import referenceDataRoutes from "./referenceData";
+import dashboardRoutes from "./dashboard";
 import {
   authTokensHandler,
   getUserByToken,
@@ -30,5 +31,6 @@ router.use("/categories", categoryRoutes);
 router.use("/projects", projectRoutes);
 router.use("/comparison", comparisonRoutes);
 router.use("/reference-data", referenceDataRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 export default router;

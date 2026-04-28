@@ -245,3 +245,9 @@ export const deleteProjectItem = async (itemId: string) => {
     where: { id: itemId },
   });
 };
+
+export const getActiveProjectsCount = async () => {
+  return prisma.project.count({
+    where: { isArchived: false },
+  });
+};

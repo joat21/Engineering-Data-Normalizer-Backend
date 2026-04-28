@@ -229,3 +229,36 @@ export const updateCategoryAttribute = async (
 
   return updatedAttribute;
 };
+
+export const getCategoriesCount = async () => {
+  return prisma.category.count();
+};
+
+export const getTopCategories = async () => {
+  const topCategories = await prisma.equipment.groupBy({
+    by: ["categoryId"],
+    _count: {
+      id: true,
+    },
+    orderBy: {
+      _count: {
+        id: "desc",
+      },
+    },
+    take: 5,
+  });
+
+  const ids = topCategories.map((c) => c.categoryId);
+
+  const categories = await prisma.category.findMany({
+    where: { id: { in: ids } },
+  });
+
+  const categoryNameMap = new Map(categories.map((c) => [c.id, c.name]));
+
+  return topCategories.map((item) => ({
+    id: item.categoryId,
+    name: categoryNameMap.get(item.categoryId) || "Без категории",
+    count: item._count.id,
+  }));
+};

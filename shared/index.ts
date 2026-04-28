@@ -7,3 +7,4 @@ export * from "./import";
 export * from "./normalization";
 export * from "./project";
 export * from "./reference-data";
+export * from "./dashboard";

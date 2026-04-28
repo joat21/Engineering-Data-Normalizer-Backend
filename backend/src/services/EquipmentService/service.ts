@@ -374,3 +374,7 @@ export const getEquipmentDetails = async (id: string) => {
     attributes,
   };
 };
+
+export const getEquipmentCount = async () => {
+  return prisma.equipment.count();
+};
