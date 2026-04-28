@@ -1,6 +1,13 @@
+import { Statistics } from "./Statistics";
 import { QuickActions } from "./QuickActions";
+import { useStatistics } from "../api/dashboard.api";
+import { PageLoader } from "@/shared/ui";
 
-export const HomePage = () => {
+export const DashboardPage = () => {
+  const { data: statistics, isLoading } = useStatistics();
+
+  if (isLoading) return <PageLoader />;
+
   return (
     <div className="flex flex-col gap-8 mx-auto px-4 w-full max-w-7xl">
       <div className="flex items-center justify-between gap-4">
@@ -11,6 +18,7 @@ export const HomePage = () => {
       </div>
 
       <QuickActions />
+      <Statistics data={statistics} />
     </div>
   );
 };

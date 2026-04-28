@@ -11,7 +11,7 @@ import { CategoriesPage } from "@/pages/categories";
 import { CategoryPage } from "@/pages/category";
 import { ProjectDetailsPage } from "@/pages/project-details";
 import { ComparisonPage } from "@/pages/comparison";
-import { HomePage } from "@/pages/home";
+import { DashboardPage } from "@/pages/dashboard";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
 
       <Route path="/" element={<MainLayout />}>
         <Route path="/" element={<RequireAuth />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<DashboardPage />} />
 
           <Route path="/import">
             <Route index element={<ImportPage />} />

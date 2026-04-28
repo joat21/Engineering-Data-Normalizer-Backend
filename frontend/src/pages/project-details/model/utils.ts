@@ -1,5 +1,6 @@
 import { toast } from "@heroui/react";
 import { exportToExcel } from "@/entities/project";
+import { formatNumber } from "@/shared/lib";
 
 export const downloadExcel = async (projectId: string, projectName: string) => {
   try {
@@ -45,9 +46,5 @@ export const formatPrice = (
     }).format(num);
   }
 
-  return new Intl.NumberFormat("ru-RU", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(num);
+  return formatNumber(num);
 };
