@@ -32,6 +32,8 @@ export const HeaderColumn = memo(
       getSelectedAttrId(attributes, col),
     );
 
+    const selectedAttr = attributes.find((attr) => attr.id === selectedAttrId);
+
     useEffect(() => {
       setSelectedAttrId(getSelectedAttrId(attributes, col));
     }, [getSelectedAttrId, attributes, col]);
@@ -67,7 +69,10 @@ export const HeaderColumn = memo(
             value={selectedAttrId}
             onChange={(value) => handleSelectAttribute(col, value)}
           />
-          <TransformationDropdown onAction={handleSelectTransformation} />
+          <TransformationDropdown
+            onAction={handleSelectTransformation}
+            selectedAttr={selectedAttr}
+          />
         </div>
       </div>
     );

@@ -29,6 +29,9 @@ export const multiply = (input: TransformPayload, factor: number) => {
   return nums.map((n) => n * factor);
 };
 
+// 12 знаков достаточно для любой инженерки, и это отрежет погрешность JS
+export const MAX_PRECISION = 12;
+
 export const multiplyNumbersInString = (
   input: TransformPayload,
   operation: OperationType,
@@ -43,7 +46,7 @@ export const multiplyNumbersInString = (
 
     return new Intl.NumberFormat("en-US", {
       useGrouping: false,
-      maximumFractionDigits: 12, // 12 знаков достаточно для любой инженерки, и это отрежет погрешность JS
+      maximumFractionDigits: MAX_PRECISION,
     }).format(transformed);
   });
 

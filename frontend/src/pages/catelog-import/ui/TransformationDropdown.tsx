@@ -1,14 +1,19 @@
+import { memo } from "react";
 import { Button, Dropdown, Label, type Key } from "@heroui/react";
 import { WandSparkles } from "lucide-react";
+import {
+  DataType,
+  type CategoryAttribute,
+} from "@engineering-data-normalizer/shared";
 import { TransformationType } from "../model/types";
-import { memo } from "react";
 
 interface TransformationDropdownProps {
   onAction?: (key: Key) => void;
+  selectedAttr: CategoryAttribute | undefined;
 }
 
 export const TransformationDropdown = memo(
-  ({ onAction }: TransformationDropdownProps) => {
+  ({ onAction, selectedAttr }: TransformationDropdownProps) => {
     return (
       <Dropdown>
         <Button isIconOnly>
@@ -28,6 +33,14 @@ export const TransformationDropdown = memo(
             >
               <Label>Разбить по символу</Label>
             </Dropdown.Item>
+            {(!selectedAttr || selectedAttr.dataType === DataType.NUMBER) && (
+              <Dropdown.Item
+                id={TransformationType.MULTIPLY}
+                textValue="Умножить / Разделить"
+              >
+                <Label>Умножить / Разделить</Label>
+              </Dropdown.Item>
+            )}
             <Dropdown.Item
               id={TransformationType.AI_PARSE}
               textValue="ИИ-анализ"

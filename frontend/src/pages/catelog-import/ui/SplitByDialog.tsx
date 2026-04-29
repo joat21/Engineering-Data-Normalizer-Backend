@@ -85,8 +85,6 @@ export const SplitByDialog = ({
       targets: targets,
     };
 
-    console.log(payload);
-
     applyTransformMutation.mutate(payload, {
       onSuccess: (data, variables) => {
         if (data.issues.length > 0) {

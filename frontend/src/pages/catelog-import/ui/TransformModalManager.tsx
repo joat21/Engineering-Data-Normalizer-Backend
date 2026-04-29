@@ -11,6 +11,7 @@ import {
   useSelectionStore,
   useTransformationContextStore,
 } from "../model/store";
+import { MultiplyDialog } from "./MultiplyDialog";
 
 interface TransformModalManagerProps {
   rows: StagingRow[];
@@ -65,13 +66,17 @@ const ModalContentRouter = ({
   if (!activeContext) return;
 
   const selectedRowIds = useSelectionStore((s) => s.selectedRowIds);
+  const type = activeContext.type;
 
-  switch (activeContext.type) {
+  switch (type) {
     case TransformationType.EXTRACT_NUMBERS:
       return <ExtractNumbersDialog column={activeContext.column} {...props} />;
 
     case TransformationType.SPLIT_BY:
       return <SplitByDialog column={activeContext.column} {...props} />;
+
+    case TransformationType.MULTIPLY:
+      return <MultiplyDialog column={activeContext.column} {...props} />;
 
     case TransformationType.AI_PARSE:
       if (activeContext.step === "CONFIG_MODAL") {
@@ -86,7 +91,9 @@ const ModalContentRouter = ({
 
       return;
 
-    default:
-      return null;
+    default: {
+      const _exhaustive: never = type;
+      return _exhaustive;
+    }
   }
 };

@@ -1,11 +1,13 @@
 import {
   multiplyNumbersInString,
+  OperationType,
   parseNumbers,
   splitBySeparator,
   TransformConfig,
   TransformPayload,
   TransformType,
 } from "@engineering-data-normalizer/shared";
+import { ApiError } from "../../../exceptions/api-error";
 
 export const applyTransform = (
   value: TransformPayload,
@@ -19,10 +21,21 @@ export const applyTransform = (
       return splitBySeparator(String(value), transform.payload.separator);
 
     case TransformType.MULTIPLY:
+      const { payload } = transform;
+
+      if (payload.value === 0) {
+        const operand =
+          payload.operation === OperationType.MULTIPLY
+            ? "Множитель"
+            : "Делитель";
+
+        throw ApiError.BadRequest(`${operand} не может быть равен нулю`);
+      }
+
       return multiplyNumbersInString(
         String(value),
-        transform.payload.operation,
-        transform.payload.value,
+        payload.operation,
+        payload.value,
       );
 
     default: {
