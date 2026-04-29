@@ -12,7 +12,7 @@ export const AiParseRowsSelectionPanel = () => {
   const setTransformationContext = useTransformationContextStore(
     (s) => s.setContext,
   );
-  const isSelecting = useSelectionStore((s) => !!s.activeContext);
+  const isSelecting = useSelectionStore((s) => s.activeContext === "ai_parse");
   const setSelectionContext = useSelectionStore((s) => s.setContext);
   const count = useSelectionStore((s) => s.count);
 
@@ -47,7 +47,11 @@ export const AiParseRowsSelectionPanel = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button onPress={handleCancel} className="font-medium">
+        <Button
+          onPress={handleCancel}
+          className="font-medium"
+          variant="outline"
+        >
           Отмена
         </Button>
         <Button

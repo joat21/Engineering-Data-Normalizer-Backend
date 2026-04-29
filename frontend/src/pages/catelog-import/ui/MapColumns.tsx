@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router";
 import { Button, useOverlayState } from "@heroui/react";
-import { Plus, Save } from "lucide-react";
+import { Plus, Save, Trash } from "lucide-react";
 import { ResolveNormalizationIssuesModal } from "./ResolveNormalizationIssuesModal";
 import { AiParseRowsSelectionPanel } from "./AiParseRowsSelectionPanel";
+import { DeleteRowsSelectionPanel } from "./DeleteRowsSelectionPanel";
 import { TableBody } from "./TableBody";
 import { TableHeader } from "./TableHeader";
 import { TransformModalManager } from "./TransformModalManager";
+import { ConfirmRowsDeletionModal } from "./ConfirmRowsDeletionModal";
+import { useSelectionStore } from "../model/store";
 import {
   CatalogImportStep,
   useCreateEquipmentFromStagingMutation,
@@ -14,6 +17,7 @@ import {
 } from "@/features/import";
 import { useAttributesForImport } from "@/entities/category-attribute";
 import { CreateCategoryAttributeModal } from "@/features/create-category-attibute";
+import { useDeleteStagingItemsMutation } from "@/features/delete-staging-items";
 import { PageLoader, ImportSuccessModal } from "@/shared/ui";
 
 interface MapColumnsProps {
@@ -24,14 +28,21 @@ interface MapColumnsProps {
 export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
   const navigate = useNavigate();
   const successModal = useOverlayState();
+  const confirmRowsDeletionModal = useOverlayState();
   const createCategoryAttributeModal = useOverlayState();
 
   const categoryName = useImportStore((s) => s.categoryName);
   const resetImport = useImportStore((s) => s.reset);
   const setStep = useImportStore((s) => s.setStep);
 
+  const selectedRowIds = useSelectionStore((s) => s.selectedRowIds);
+  const count = useSelectionStore((s) => s.count);
+  const setSelectionContext = useSelectionStore((s) => s.setContext);
+
   const createEquipmentFromStagingMutation =
     useCreateEquipmentFromStagingMutation();
+
+  const deleteStagingItemsMutation = useDeleteStagingItemsMutation();
 
   const { data: table, isPending: isTablePending } = useStagingTable({
     sessionId,
@@ -61,6 +72,24 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
     setStep(CatalogImportStep.INIT_TABLE);
   };
 
+  const handleDeletingRowsSelect = () => {
+    setSelectionContext("delete");
+  };
+
+  const handleDeleteRows = () => {
+    console.log(Object.keys(selectedRowIds));
+
+    deleteStagingItemsMutation.mutate(
+      { ids: Object.keys(selectedRowIds) },
+      {
+        onSuccess: () => {
+          confirmRowsDeletionModal.close();
+          setSelectionContext(null);
+        },
+      },
+    );
+  };
+
   return (
     <>
       {/* h-[calc(100dvh-48px)] - здесь 48px = суммарный вертикальный паддинг обертки из MainLayout */}
@@ -80,6 +109,15 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
               <Button onPress={createCategoryAttributeModal.open} size="sm">
                 <Plus size={16} />
                 Добавить новый атрибут
+              </Button>
+              <span> |</span>
+              <Button
+                onPress={handleDeletingRowsSelect}
+                variant="danger-soft"
+                size="sm"
+              >
+                <Trash size={16} />
+                Удалить строки
               </Button>
             </div>
           </div>
@@ -111,6 +149,15 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
       </div>
 
       <AiParseRowsSelectionPanel />
+
+      <DeleteRowsSelectionPanel onContinue={confirmRowsDeletionModal.open} />
+
+      <ConfirmRowsDeletionModal
+        state={confirmRowsDeletionModal}
+        rowsCount={count}
+        onDeleteRows={handleDeleteRows}
+        isPending={deleteStagingItemsMutation.isPending}
+      />
 
       <ResolveNormalizationIssuesModal />
 
