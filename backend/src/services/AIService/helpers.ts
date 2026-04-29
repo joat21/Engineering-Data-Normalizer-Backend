@@ -1,5 +1,6 @@
 import mammoth from "mammoth";
 import { PDFParse } from "pdf-parse";
+import { AiParseResult } from "../../generated/prisma/client";
 import {
   AIParseTarget,
   CategoryAttribute,
@@ -10,6 +11,7 @@ import {
   TransformPayload,
 } from "@engineering-data-normalizer/shared";
 import {
+  AiExample,
   AiParseResultData,
   AiSingleParseResult,
   ExtendedAIParseTarget,
@@ -23,13 +25,29 @@ export const generateBatchParsePrompts = (
   }[],
   targets: AIParseTarget[],
   categoryName: string,
+  exampleResults: Pick<
+    AiParseResult,
+    "rawValue" | "targetKey" | "sourceString"
+  >[],
 ) => {
+  const examples = formatAiResultsToExamples(exampleResults);
+
   const systemPrompt = `
 Ты — экспертный инструмент для парсинга инженерной номенклатуры категории ${categoryName}.
 Твоя задача: извлекать технические характеристики из строк номенклатуры.
 Если параметр отсутствует или ты не уверен — пиши null.
 НЕ повторяй значения. Значения должны быть короткими (только число или слово).
 `.trim();
+
+  const examplesBlock =
+    examples.length > 0
+      ? `Пример выполнения:\n${examples
+          .map(
+            (ex) =>
+              `Входная строка: "${ex.sourceString}"\nРезультат:\n${JSON.stringify(ex.results, null, 2)}`,
+          )
+          .join("\n\n")}\n`
+      : "";
 
   const prompt = `
 Правила:
@@ -38,6 +56,8 @@ export const generateBatchParsePrompts = (
 - НЕ повторяй значения
 - Значения должны быть короткими (только число или слово)
 - В ответе sourceString указывай отдельно от rowId
+
+${examplesBlock}
 
 Атрибуты для извлечения:
 ${targets.map((t) => `- ${t.key} (${t.label})`).join("\n")}
@@ -198,4 +218,29 @@ export const transformAiResponseToNormalizeEntities = (
       value,
     };
   });
+};
+
+const formatAiResultsToExamples = (
+  exampleResults: Pick<
+    AiParseResult,
+    "rawValue" | "targetKey" | "sourceString"
+  >[],
+): AiExample[] => {
+  const grouped = exampleResults.reduce((acc, curr) => {
+    const { sourceString, targetKey, rawValue } = curr;
+
+    if (!acc.has(sourceString)) {
+      acc.set(sourceString, {
+        sourceString: sourceString,
+        results: {},
+      });
+    }
+
+    const example = acc.get(sourceString)!;
+    example.results[targetKey] = rawValue === "null" ? null : rawValue;
+
+    return acc;
+  }, new Map<string, AiExample>());
+
+  return Array.from(grouped.values());
 };

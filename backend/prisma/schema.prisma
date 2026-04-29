@@ -211,6 +211,7 @@ model AiParseResult {
   sessionId      String            @db.Uuid
   sourceItem     StagingImportItem @relation(fields: [sourceItemId], references: [id])
   sourceItemId   String            @db.Uuid
+  sourceString   String
   targetType     MappingTargetType
   targetKey      String
   rawValue       String

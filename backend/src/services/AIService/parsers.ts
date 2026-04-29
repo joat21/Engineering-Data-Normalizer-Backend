@@ -7,6 +7,7 @@ import {
   CategoryAttribute,
   TransformPayload,
 } from "@engineering-data-normalizer/shared";
+import { AiParseResult } from "../../generated/prisma/client";
 import {
   generateBatchParsePrompts,
   generateSingleParsePrompts,
@@ -27,11 +28,16 @@ export const llmBatchParse = async (
   }[],
   targets: AIParseTarget[],
   categoryName: string,
+  exampleResults: Pick<
+    AiParseResult,
+    "rawValue" | "targetKey" | "sourceString"
+  >[],
 ): Promise<AiBatchParseResult[]> => {
   const { systemPrompt, prompt } = generateBatchParsePrompts(
     lines,
     targets,
     categoryName,
+    exampleResults,
   );
 
   // const { tokensUsage, parsed, responseText, modelName } = await googleAiBatchParse(systemPrompt, prompt, targets);

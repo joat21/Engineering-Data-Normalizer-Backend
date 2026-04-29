@@ -40,7 +40,7 @@ export const processAiParsing = async (data: {
     testRowIds,
   } = data;
 
-  let sessionId;
+  let sessionId: string;
   const isTestRun = !parsingSessionId;
 
   const importSession = await prisma.importSession.findUnique({
@@ -103,10 +103,20 @@ export const processAiParsing = async (data: {
 
   const chunks = chunkArray(linesToParse, CHUNK_SIZE);
 
+  const exampleResults = await prisma.aiParseResult.findMany({
+    where: { sessionId },
+    select: { sourceString: true, targetKey: true, rawValue: true },
+  });
+
   const batchResults = await pMap(
     chunks,
     async (chunk) => {
-      return await llmBatchParse(chunk, targets, importSession.category.name);
+      return await llmBatchParse(
+        chunk,
+        targets,
+        importSession.category.name,
+        exampleResults,
+      );
     },
     { concurrency: CONCURRENCY },
   );
@@ -116,7 +126,7 @@ export const processAiParsing = async (data: {
   const recordsToSave: Prisma.AiParseResultCreateManyInput[] = [];
 
   for (const result of parseResults) {
-    const { rowId, extracted } = result;
+    const { rowId, sourceString, extracted } = result;
 
     for (const target of targets) {
       const value = extracted[target.key];
@@ -127,6 +137,7 @@ export const processAiParsing = async (data: {
         targetKey: target.key,
         targetType: target.type,
         rawValue: String(value),
+        sourceString,
       });
     }
   }
@@ -141,8 +152,6 @@ export const processAiParsing = async (data: {
       sourceItem: {
         select: {
           rawRow: true,
-          rowIndex: true,
-          transformedRow: true,
         },
       },
     },
@@ -160,13 +169,10 @@ export const processAiParsing = async (data: {
 
   for (const res of allResults) {
     if (!groupedMap.has(res.sourceItemId)) {
-      // TODO: в идеале сохранять sourceString в таблицу AiParseResult
       let sourceString = "";
+
       if (subIndex !== undefined) {
-        const mappedCol = (res.sourceItem.transformedRow as TransformedRow)[
-          colIndex
-        ];
-        sourceString = mappedCol?.[subIndex]?.normalized?.valueString ?? "";
+        sourceString = res.sourceString;
       } else {
         sourceString = String(
           getRawValue(res.sourceItem.rawRow, colIndex) ?? "",

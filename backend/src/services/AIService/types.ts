@@ -22,3 +22,8 @@ export type AiParseResultData<T> = {
 export type ExtendedAIParseTarget = AIParseTarget & {
   attributeId?: string;
 };
+
+export interface AiExample {
+  sourceString: string;
+  results: Record<string, string | null>;
+}
