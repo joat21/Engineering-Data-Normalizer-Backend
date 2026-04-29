@@ -219,3 +219,17 @@ export const getStagingTable = async (sessionId: string) => {
 
   return { columns, rows };
 };
+
+export const deleteStagingItems = async (ids: string[]) => {
+  return prisma.$transaction(async (tx) => {
+    await tx.aiParseResult.deleteMany({
+      where: { sourceItemId: { in: ids } },
+    });
+
+    const result = await tx.stagingImportItem.deleteMany({
+      where: { id: { in: ids } },
+    });
+
+    return result;
+  });
+};

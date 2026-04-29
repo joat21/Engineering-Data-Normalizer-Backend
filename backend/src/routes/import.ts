@@ -2,6 +2,7 @@ import { Router } from "express";
 import { upload } from "../middleware/upload";
 import { validate } from "../middleware/validate";
 import {
+  deleteStagingItemsSchema,
   getStagingTableSchema,
   importRowsSchema,
   initImportSchema,
@@ -27,6 +28,12 @@ router.get(
   "/:sessionId",
   validate(getStagingTableSchema),
   ImportController.getStagingTableHandler,
+);
+
+router.delete(
+  "/staging",
+  validate(deleteStagingItemsSchema),
+  ImportController.deleteStagingItemsHandler,
 );
 
 export default router;

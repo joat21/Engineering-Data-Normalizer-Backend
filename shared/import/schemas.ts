@@ -31,3 +31,9 @@ export const importRowsSchema = z.object({
 export const getStagingTableSchema = z.object({
   params: z.object({ sessionId: z.uuid() }),
 });
+
+export const deleteStagingItemsSchema = z.object({
+  body: z.object({
+    ids: z.array(z.uuid()),
+  }),
+});

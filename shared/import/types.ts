@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  deleteStagingItemsSchema,
   getStagingTableSchema,
   importRowsSchema,
   initImportSchema,
@@ -38,4 +39,8 @@ export type ImportRowsBody = z.infer<typeof importRowsSchema.shape.body>;
 
 export type GetStagingTableParams = z.infer<
   typeof getStagingTableSchema.shape.params
+>;
+
+export type DeleteStagingItemsBody = z.infer<
+  typeof deleteStagingItemsSchema.shape.body
 >;

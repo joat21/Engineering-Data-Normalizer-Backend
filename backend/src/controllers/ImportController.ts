@@ -1,9 +1,11 @@
 import {
   addItemsToStaging,
   createSession,
+  deleteStagingItems,
   getStagingTable,
 } from "../services/ImportService/service";
 import {
+  deleteStagingItemsSchema,
   getStagingTableSchema,
   importRowsSchema,
   initImportSchema,
@@ -48,6 +50,17 @@ export const getStagingTableHandler: HandlerFromSchema<
 > = async (req, res, next) => {
   try {
     const result = await getStagingTable(req.params.sessionId);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteStagingItemsHandler: HandlerFromSchema<
+  typeof deleteStagingItemsSchema
+> = async (req, res, next) => {
+  try {
+    const result = await deleteStagingItems(req.body.ids);
     res.json(result);
   } catch (error) {
     next(error);
