@@ -30,8 +30,9 @@ export const TableHeader = ({
 }: TableHeaderProps) => {
   const mappingMutation = useMappingMutation();
 
+  const isSelecting = useSelectionStore((s) => s.isSelecting);
+  const setIsSelecting = useSelectionStore((s) => s.setIsSelecting);
   const setContext = useTransformationContextStore((s) => s.setContext);
-  const isSelecting = useTransformationContextStore((s) => s.isSelecting);
   const setNormalizationContext = useTransformationContextStore(
     (s) => s.setNormalizationContext,
   );
@@ -82,6 +83,7 @@ export const TableHeader = ({
           column: col,
           step: "SELECTING_ROWS",
         });
+        setIsSelecting(true);
       } else {
         setContext({ type, column: col });
       }

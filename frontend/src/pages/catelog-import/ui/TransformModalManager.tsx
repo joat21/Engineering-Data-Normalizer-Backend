@@ -24,10 +24,14 @@ export const TransformModalManager = ({
   attributes,
   sessionId,
 }: TransformModalManagerProps) => {
+  const setIsSelecting = useSelectionStore((s) => s.setIsSelecting);
   const activeContext = useTransformationContextStore((s) => s.activeContext);
   const setContext = useTransformationContextStore((s) => s.setContext);
 
-  const handleClose = () => setContext(null);
+  const handleClose = () => {
+    setIsSelecting(false);
+    setContext(null);
+  };
 
   let isOpen = false;
   if (activeContext?.type === TransformationType.AI_PARSE) {

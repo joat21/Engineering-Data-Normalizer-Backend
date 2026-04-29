@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { TransformationType, type TransformationContext } from "./types";
+import { type TransformationContext } from "./types";
 import type {
   MappingTarget,
   NormalizationIssue,
@@ -8,13 +8,16 @@ import type {
 } from "@engineering-data-normalizer/shared";
 
 interface SelectionStore {
+  isSelecting: boolean;
   selectedRowIds: Record<string, boolean>;
   count: number;
+  setIsSelecting: (isSelecting: boolean) => void;
   toggleRow: (id: string) => void;
   clear: () => void;
 }
 
 export const useSelectionStore = create<SelectionStore>((set) => ({
+  isSelecting: false,
   selectedRowIds: {},
   count: 0,
 
@@ -32,6 +35,8 @@ export const useSelectionStore = create<SelectionStore>((set) => ({
         count: isSelected ? state.count - 1 : state.count + 1,
       };
     }),
+
+  setIsSelecting: (isSelecting) => set({ isSelecting }),
 
   clear: () => set({ selectedRowIds: {}, count: 0 }),
 }));
@@ -51,7 +56,6 @@ interface NormalizationContext {
 interface TransformationContextStore {
   activeContext: TransformationContext | null;
   setContext: (context: TransformationContext | null) => void;
-  isSelecting: boolean;
   normalizationContext: NormalizationContext | null;
   setNormalizationContext: (context: NormalizationContext | null) => void;
 }
@@ -63,7 +67,6 @@ export const useTransformationContextStore = create<TransformationContextStore>(
     setContext: (context) =>
       set({
         activeContext: context,
-        isSelecting: context?.type === TransformationType.AI_PARSE,
       }),
     normalizationContext: null,
     setNormalizationContext: (context) =>

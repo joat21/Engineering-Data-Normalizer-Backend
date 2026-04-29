@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { Button, useOverlayState } from "@heroui/react";
 import { Plus, Save } from "lucide-react";
 import { ResolveNormalizationIssuesModal } from "./ResolveNormalizationIssuesModal";
-import { RowsSelectionPanel } from "./RowsSelectionPanel";
+import { AiParseRowsSelectionPanel } from "./AiParseRowsSelectionPanel";
 import { TableBody } from "./TableBody";
 import { TableHeader } from "./TableHeader";
 import { TransformModalManager } from "./TransformModalManager";
@@ -110,7 +110,7 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
         </div>
       </div>
 
-      <RowsSelectionPanel />
+      <AiParseRowsSelectionPanel />
 
       <ResolveNormalizationIssuesModal />
 

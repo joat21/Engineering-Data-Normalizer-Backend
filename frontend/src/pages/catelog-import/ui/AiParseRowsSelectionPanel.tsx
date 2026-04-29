@@ -5,15 +5,17 @@ import {
 } from "../model/store";
 import { TransformationType } from "../model/types";
 
-export const RowsSelectionPanel = () => {
+export const AiParseRowsSelectionPanel = () => {
   const activeContext = useTransformationContextStore((s) => s.activeContext);
   const setContext = useTransformationContextStore((s) => s.setContext);
-  const isSelecting = useTransformationContextStore((s) => s.isSelecting);
+  const isSelecting = useSelectionStore((s) => s.isSelecting);
+  const setIsSelecting = useSelectionStore((s) => s.setIsSelecting);
   const count = useSelectionStore((s) => s.count);
 
   if (!isSelecting) return null;
 
   const handleCancel = () => {
+    setIsSelecting(false);
     setContext(null);
     useSelectionStore.getState().clear();
   };

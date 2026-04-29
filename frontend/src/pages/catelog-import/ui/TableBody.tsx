@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { StagingTable } from "@engineering-data-normalizer/shared";
 import { DataRow } from "./DataRow";
-import { useTransformationContextStore } from "../model/store";
+import { useSelectionStore } from "../model/store";
 
 interface TableBodyProps {
   table: StagingTable;
@@ -10,7 +10,7 @@ interface TableBodyProps {
 export const TableBody = ({ table }: TableBodyProps) => {
   const { columns, rows } = table;
 
-  const isSelecting = useTransformationContextStore((s) => s.isSelecting);
+  const isSelecting = useSelectionStore((s) => s.isSelecting);
 
   const columnKeys = useMemo(() => columns.map((c) => c.id), [columns]);
 
