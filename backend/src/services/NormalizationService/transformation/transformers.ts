@@ -19,7 +19,11 @@ export const applyTransform = (
       return splitBySeparator(String(value), transform.payload.separator);
 
     case TransformType.MULTIPLY:
-      return multiplyNumbersInString(String(value), transform.payload.factor);
+      return multiplyNumbersInString(
+        String(value),
+        transform.payload.operation,
+        transform.payload.value,
+      );
 
     default: {
       const _exhaustive: never = transform;

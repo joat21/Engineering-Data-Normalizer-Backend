@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { SYSTEM_FIELD_KEYS } from "./constants";
-import { MappingTargetType, PrevActionType, TransformType } from "./types";
+import {
+  MappingTargetType,
+  OperationType,
+  PrevActionType,
+  TransformType,
+} from "./types";
 
 export const normalizedValueSchema = z.object({
   valueString: z.string(),
@@ -38,7 +43,7 @@ export const transformConfigSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal(TransformType.MULTIPLY),
-    payload: z.object({ factor: z.number() }),
+    payload: z.object({ operation: z.enum(OperationType), value: z.number() }),
   }),
 ]);
 

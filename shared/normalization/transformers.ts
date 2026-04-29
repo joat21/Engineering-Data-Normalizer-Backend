@@ -1,4 +1,4 @@
-import type { TransformPayload } from "./types";
+import { OperationType, TransformPayload } from "./types";
 
 const numberRegex = /\d+(?:[.,]\d+)?/g;
 
@@ -31,16 +31,20 @@ export const multiply = (input: TransformPayload, factor: number) => {
 
 export const multiplyNumbersInString = (
   input: TransformPayload,
-  factor: number,
+  operation: OperationType,
+  value: number,
 ): string[] => {
   if (!input) return [];
 
   const res = String(input).replace(numberRegex, (match) => {
     const num = parseFloat(match.replace(",", "."));
-    const transformed = num * factor;
+    const transformed =
+      operation === OperationType.MULTIPLY ? num * value : num / value;
 
-    // TODO: toFixed(4) - подумать над указанием точности, чтобы не отбросить лишнего
-    return parseFloat(transformed.toFixed(4)).toString();
+    return new Intl.NumberFormat("en-US", {
+      useGrouping: false,
+      maximumFractionDigits: 12, // 12 знаков достаточно для любой инженерки, и это отрежет погрешность JS
+    }).format(transformed);
   });
 
   return [res];

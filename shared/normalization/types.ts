@@ -39,6 +39,13 @@ export type TransformType = (typeof TransformType)[keyof typeof TransformType];
 
 export type TransformConfig = z.infer<typeof transformConfigSchema>;
 
+export const OperationType = {
+  MULTIPLY: "multiply",
+  DIVIDE: "divide",
+} as const;
+
+export type OperationType = (typeof OperationType)[keyof typeof OperationType];
+
 export type EnrichedTarget = MappingTarget & {
   label: string;
   dataType: DataType;
