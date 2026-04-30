@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   applyTransformSchema,
   mapColToAttrSchema,
+  resetColumnSchema,
   resolveNormalizationIssuesSchema,
 } from "@engineering-data-normalizer/shared";
 import { validate } from "../middleware/validate";
@@ -27,6 +28,12 @@ router.patch(
   "/:sessionId",
   validate(resolveNormalizationIssuesSchema),
   NormalizationController.resolveNormalizationIssuesHandler,
+);
+
+router.patch(
+  "/:sessionId/reset",
+  validate(resetColumnSchema),
+  NormalizationController.resetColumnHandler,
 );
 
 export default router;

@@ -7,12 +7,14 @@ import {
   resolveNormalizationIssuesSchema,
   transformConfigSchema,
   parseFileSchema,
+  resetColumnSchema,
 } from "@engineering-data-normalizer/shared";
 import {
   commitAiParsingResults,
   applyColumnTransformation,
   mapColumnToAttribute,
   resolveNormalizationIssues,
+  resetColumn,
 } from "../services/NormalizationService/service";
 import { HandlerFromSchema } from "../types/zod";
 import {
@@ -116,6 +118,17 @@ export const resolveNormalizationIssuesHandler: HandlerFromSchema<
       ...req.body,
     });
     res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetColumnHandler: HandlerFromSchema<
+  typeof resetColumnSchema
+> = async (req, res, next) => {
+  try {
+    await resetColumn({ ...req.params, ...req.body });
+    res.sendStatus(204);
   } catch (error) {
     next(error);
   }

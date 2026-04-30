@@ -95,3 +95,12 @@ export const resolveNormalizationIssuesSchema = z.object({
     parsingSessionId: z.uuid().optional(),
   }),
 });
+
+export const resetColumnSchema = z.object({
+  params: z.object({
+    sessionId: z.uuid(),
+  }),
+  body: z.object({
+    colIndex: z.number(),
+  }),
+});

@@ -262,3 +262,16 @@ export const resolveNormalizationIssues = async (params: {
     target,
   });
 };
+
+export const resetColumn = async (params: {
+  sessionId: string;
+  colIndex: number;
+}) => {
+  const { sessionId, colIndex } = params;
+
+  await prisma.$executeRaw`
+    UPDATE "StagingImportItem"
+    SET "transformedRow" = "transformedRow" - ${colIndex.toString()}
+    WHERE "sessionId" = ${sessionId}::uuid
+  `;
+};

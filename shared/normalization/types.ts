@@ -6,6 +6,7 @@ import {
   mapColToAttrSchema,
   normalizedDataSchema,
   normalizedValueSchema,
+  resetColumnSchema,
   resolveNormalizationIssuesSchema,
   systemTargetSchema,
   transformConfigSchema,
@@ -117,3 +118,6 @@ export type ResolveNormalizationIssuesParams = z.infer<
 export type ResolveNormalizationIssuesBody = z.infer<
   typeof resolveNormalizationIssuesSchema.shape.body
 >;
+
+export type ResetColumnParams = z.infer<typeof resetColumnSchema.shape.params>;
+export type ResetColumnBody = z.infer<typeof resetColumnSchema.shape.body>;
