@@ -19,6 +19,9 @@ import { useAttributesForImport } from "@/entities/category-attribute";
 import { CreateCategoryAttributeModal } from "@/features/create-category-attibute";
 import { useDeleteStagingItemsMutation } from "@/features/delete-staging-items";
 import { PageLoader, ImportSuccessModal } from "@/shared/ui";
+import { ConfirmResetColumnModal } from "@/features/reset-column";
+import { useState } from "react";
+import type { StagingColumn } from "@engineering-data-normalizer/shared";
 
 interface MapColumnsProps {
   sessionId: string;
@@ -29,6 +32,7 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
   const navigate = useNavigate();
   const successModal = useOverlayState();
   const confirmRowsDeletionModal = useOverlayState();
+  const confirmResetColumnModal = useOverlayState();
   const createCategoryAttributeModal = useOverlayState();
 
   const categoryName = useImportStore((s) => s.categoryName);
@@ -38,6 +42,8 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
   const selectedRowIds = useSelectionStore((s) => s.selectedRowIds);
   const count = useSelectionStore((s) => s.count);
   const setSelectionContext = useSelectionStore((s) => s.setContext);
+
+  const [selectedCol, setSelectedCol] = useState<StagingColumn | null>(null);
 
   const createEquipmentFromStagingMutation =
     useCreateEquipmentFromStagingMutation();
@@ -88,6 +94,11 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
         },
       },
     );
+  };
+
+  const handleSelectColToReset = (col: StagingColumn) => {
+    setSelectedCol(col);
+    confirmResetColumnModal.open();
   };
 
   return (
@@ -141,6 +152,7 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
                 attributes={attributes}
                 isAttributesPending={isAttributesPending}
                 sessionId={sessionId}
+                onSelectColToReset={handleSelectColToReset}
               />
               <TableBody table={table} />
             </table>
@@ -157,6 +169,12 @@ export const MapColumns = ({ sessionId, categoryId }: MapColumnsProps) => {
         rowsCount={count}
         onDeleteRows={handleDeleteRows}
         isPending={deleteStagingItemsMutation.isPending}
+      />
+
+      <ConfirmResetColumnModal
+        state={confirmResetColumnModal}
+        sessionId={sessionId}
+        col={selectedCol}
       />
 
       <ResolveNormalizationIssuesModal />

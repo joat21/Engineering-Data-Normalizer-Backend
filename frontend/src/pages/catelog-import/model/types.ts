@@ -40,6 +40,10 @@ export const TransformationType = {
 export type TransformationType =
   (typeof TransformationType)[keyof typeof TransformationType];
 
+// если понадобятся еще действия, то лучше их вынести в отдельный тип,
+// а потом делать юнион
+export type TableActionKey = TransformationType | "reset-col";
+
 export interface TransformationDialogProps {
   attributes: CategoryAttribute[];
   column: StagingColumn;

@@ -12,7 +12,7 @@ import {
   useSelectionStore,
   useTransformationContextStore,
 } from "../model/store";
-import { TransformationType } from "../model/types";
+import { TransformationType, type TableActionKey } from "../model/types";
 import { useMappingMutation } from "@/features/import";
 
 interface TableHeaderProps {
@@ -20,6 +20,7 @@ interface TableHeaderProps {
   attributes: CategoryAttribute[];
   isAttributesPending: boolean;
   sessionId: string;
+  onSelectColToReset: (col: StagingColumn) => void;
 }
 
 export const TableHeader = ({
@@ -27,6 +28,7 @@ export const TableHeader = ({
   attributes,
   isAttributesPending,
   sessionId,
+  onSelectColToReset,
 }: TableHeaderProps) => {
   const mappingMutation = useMappingMutation();
 
@@ -76,18 +78,25 @@ export const TableHeader = ({
     [attributes, mappingMutation, sessionId],
   );
 
-  const handleSelectTransformation = useCallback(
-    (col: StagingColumn, type: TransformationType) => {
-      if (type === TransformationType.AI_PARSE) {
+  const handleAction = useCallback(
+    (col: StagingColumn, key: Key) => {
+      const actionType = key as TableActionKey;
+
+      if (actionType === "reset-col") {
+        onSelectColToReset(col);
+        return;
+      }
+
+      if (actionType === TransformationType.AI_PARSE) {
         useSelectionStore.getState().clear();
         setTransformationContext({
-          type,
+          type: actionType,
           column: col,
           step: "SELECTING_ROWS",
         });
         setSelectionContext("ai_parse");
       } else {
-        setTransformationContext({ type, column: col });
+        setTransformationContext({ type: actionType, column: col });
       }
     },
     [setTransformationContext],
@@ -103,7 +112,7 @@ export const TableHeader = ({
               col={col}
               attributes={attributes}
               onSelectAttribute={handleSelectAttribute}
-              onSelectTransformation={handleSelectTransformation}
+              onSelectTransformation={handleAction}
               isAttributesPending={isAttributesPending}
             />
           </th>
