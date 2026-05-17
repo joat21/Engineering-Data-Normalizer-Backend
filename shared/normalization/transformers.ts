@@ -1,4 +1,4 @@
-import { OperationType, TransformPayload } from "./types";
+import { OperationType, type TransformPayload } from "./types";
 
 const numberRegex = /\d+(?:[.,]\d+)?/g;
 

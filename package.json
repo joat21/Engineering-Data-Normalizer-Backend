@@ -2,6 +2,7 @@
   "name": "engineering-data-normalizer",
   "private": true,
   "scripts": {
+    "dev": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
     "dev:back": "npm run dev --prefix backend",
     "dev:front": "npm run dev --prefix frontend",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,5 +11,8 @@
     "backend",
     "frontend",
     "shared"
-  ]
+  ],
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

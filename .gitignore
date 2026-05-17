@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .env*
+!.env.example
 .vscode/
 
 backend/prisma/migration_lock.toml
