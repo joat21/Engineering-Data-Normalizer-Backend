@@ -1,14 +1,26 @@
-import { useProjects } from "@/entities/project";
-import { AppLink, PageLoader } from "@/shared/ui";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { Button, useOverlayState } from "@heroui/react";
 import { Plus } from "lucide-react";
-import { CreateProjectModal } from "@/features/create-project";
 import { ProjectCard } from "./ProjectCard";
 import { EmptyState } from "./EmptyState";
+import { CreateProjectModal } from "@/features/create-project";
+import { useProjects } from "@/entities/project";
+import { AppLink, PageLoader } from "@/shared/ui";
 
 export const ProjectsPage = () => {
   const createProjectModal = useOverlayState();
   const { data: projects, isPending } = useProjects();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.openCreateModal) {
+      createProjectModal.open();
+      navigate(".", { replace: true, state: {} });
+    }
+  }, []);
 
   if (isPending) return <PageLoader />;
 

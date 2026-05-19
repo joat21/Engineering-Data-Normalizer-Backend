@@ -26,7 +26,11 @@ export const QuickActions = () => {
           </AppLink>
         </li>
         <li className="w-full list-none">
-          <AppLink to="/projects?create=true" className="w-full no-underline">
+          <AppLink
+            to="/projects"
+            state={{ openCreateModal: true }}
+            className="w-full no-underline"
+          >
             <QuickActionCard
               title="Создать проект"
               description="Новый проект"
